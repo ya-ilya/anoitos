@@ -4,7 +4,7 @@ import org.anoitos.interpreter.library.Library
 import org.anoitos.interpreter.library.LibraryFunction
 
 @Suppress("unused")
-object StandardLibrary : Library() {
+object IOLibrary : Library() {
     @LibraryFunction
     fun println(text: Any?) {
         kotlin.io.println(text)

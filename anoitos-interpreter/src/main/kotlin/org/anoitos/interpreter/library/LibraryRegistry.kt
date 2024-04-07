@@ -1,12 +1,14 @@
 package org.anoitos.interpreter.library
 
-import org.anoitos.interpreter.library.libraries.StandardLibrary
+import org.anoitos.interpreter.library.libraries.IOLibrary
+import org.anoitos.interpreter.library.libraries.MathLibrary
 
 object LibraryRegistry {
     val libraries = mutableMapOf<String, Library>()
 
     init {
-        this["standard"] = StandardLibrary
+        this["io"] = IOLibrary
+        this["math"] = MathLibrary
     }
 
     operator fun set(name: String, library: Library) {
