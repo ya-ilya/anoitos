@@ -1,9 +1,11 @@
+val anoitosVersion: String by project
+
 plugins {
-    kotlin("jvm") version "1.9.23"
+    kotlin("jvm")
 }
 
 group = "org.anoitos"
-version = "0.1"
+version = anoitosVersion
 
 repositories {
     mavenCentral()
