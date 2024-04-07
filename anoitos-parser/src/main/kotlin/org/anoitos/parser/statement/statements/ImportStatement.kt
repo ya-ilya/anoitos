@@ -11,7 +11,7 @@ data class ImportStatement(
 ) : Statement {
     companion object : StatementParser<ImportStatement> {
         override fun parse(input: List<Token>): Pair<Int, ImportStatement>? {
-            val (size, _, _, paths, _) = input.search(
+            val (size, _, paths, _) = input.search(
                 TokenType.IMPORT,
                 TokenType.SEARCH_GROUP,
                 TokenType.SEMICOLON

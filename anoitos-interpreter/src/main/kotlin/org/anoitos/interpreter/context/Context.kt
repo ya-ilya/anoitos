@@ -1,17 +1,22 @@
 package org.anoitos.interpreter.context
 
 import org.anoitos.interpreter.extensions.interpret
+import org.anoitos.interpreter.library.Library
+import org.anoitos.interpreter.library.libraries.StandardLibrary
 import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.parser.statement.statements.FunStatement
 
 class Context(private val parent: Context? = null) {
     private var isFunContext: Boolean = false
-    private val imports = mutableListOf<Module>()
+    private val imports = mutableListOf<Library>()
     private val variables = mutableMapOf<String, Any>()
     private val functions = mutableListOf<FunStatement>()
 
     fun addImport(path: String) {
-        TODO()
+        when (path) {
+            "standard" -> imports.add(StandardLibrary)
+            else -> throw Exception()
+        }
     }
 
     fun addVariable(name: String, value: Any) {
@@ -53,7 +58,33 @@ class Context(private val parent: Context? = null) {
         val function = getFunction(name)
 
         if (function == null) {
-            TODO()
+            val method = getImports()
+                .filter { it.getFunction(name) != null }
+                .associateWith { it.getFunction(name)!! }
+                .toList().getOrNull(0)
+
+            if (method != null) {
+                val methodArguments = mutableListOf<Any>()
+                for ((index, parameter) in method.second.parameters.withIndex()) {
+                    if (index == method.second.parameters.lastIndex && parameter.isVarArgs) {
+                        methodArguments.add(
+                            arguments
+                                .drop(index)
+                                .toTypedArray()
+                        )
+                        continue
+                    }
+
+                    methodArguments.add(arguments[index])
+                }
+
+                return when (val result = method.second.invoke(method.first, *methodArguments.toTypedArray())) {
+                    is InterpretResult.Return -> result.value
+                    else -> null
+                }
+            } else {
+                throw Exception()
+            }
         }
 
         val context = Context(funParent)
@@ -75,6 +106,6 @@ class Context(private val parent: Context? = null) {
     fun getFunction(name: String): FunStatement? =
         functions.firstOrNull { it.name.value == name } ?: parent?.getFunction(name)
 
-    fun getImports(): List<Module> =
+    fun getImports(): List<Library> =
         imports + (parent?.getImports() ?: emptyList())
 }
