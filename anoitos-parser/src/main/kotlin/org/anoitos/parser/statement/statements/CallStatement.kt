@@ -14,13 +14,12 @@ data class CallStatement(
 ) : Statement {
     companion object : StatementParser<CallStatement> {
         override fun parse(input: List<Token>): Pair<Int, CallStatement>? {
-            val (size, result) = input.search(
+            val (size, name, _, arguments, _) = input.search(
                 TokenType.ID,
                 TokenType.LPAREN,
                 TokenType.SEARCH_GROUP,
                 TokenType.RPAREN
             ) ?: return null
-            val (name, _, arguments, _) = result
 
             val argumentStatements = mutableListOf<Statement>()
             val argument = mutableListOf<Token>()

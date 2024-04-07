@@ -13,14 +13,13 @@ data class VarStatement(
 ) : Statement {
     companion object : StatementParser<VarStatement> {
         override fun parse(input: List<Token>): Pair<Int, VarStatement>? {
-            val (size, result) = input.search(
+            val (size, _, name, _, value, _) = input.search(
                 TokenType.VAR,
                 TokenType.ID,
                 TokenType.EQUAL,
                 TokenType.SEARCH_GROUP,
                 TokenType.SEMICOLON
             ) ?: return null
-            val (_, name, _, value, _) = result
 
             return size to VarStatement(
                 name[0],

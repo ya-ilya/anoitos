@@ -15,7 +15,7 @@ data class ForEachStatement(
 ) : Statement {
     companion object : StatementParser<ForEachStatement> {
         override fun parse(input: List<Token>): Pair<Int, ForEachStatement>? {
-            val (size, result) = input.search(
+            val (size, _, _, identifier, _, value, _, _, body, _) = input.search(
                 TokenType.FOR,
                 TokenType.LPAREN,
                 TokenType.ID,
@@ -26,7 +26,6 @@ data class ForEachStatement(
                 TokenType.SEARCH_GROUP,
                 TokenType.RBRACE
             ) ?: return null
-            val (_, _, identifier, _, value, _, _, body, _) = result
 
             return size to ForEachStatement(
                 IdentifierExpression.parse(identifier)!!.second,

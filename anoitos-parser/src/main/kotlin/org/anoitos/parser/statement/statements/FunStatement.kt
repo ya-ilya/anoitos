@@ -13,7 +13,7 @@ data class FunStatement(
 ) : Statement {
     companion object : StatementParser<FunStatement> {
         override fun parse(input: List<Token>): Pair<Int, FunStatement>? {
-            val (size, result) = input.search(
+            val (size, _, name, _, parameters, _, _, body, _) = input.search(
                 TokenType.FUN,
                 TokenType.ID,
                 TokenType.LPAREN,
@@ -23,7 +23,6 @@ data class FunStatement(
                 TokenType.SEARCH_GROUP,
                 TokenType.RBRACE
             ) ?: return null
-            val (_, name, _, parameters, _, _, body, _) = result
 
             val parameterNames = mutableListOf<String>()
 

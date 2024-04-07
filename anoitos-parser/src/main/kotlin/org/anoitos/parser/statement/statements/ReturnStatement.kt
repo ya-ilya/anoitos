@@ -12,12 +12,11 @@ data class ReturnStatement(
 ) : Statement {
     companion object : StatementParser<ReturnStatement> {
         override fun parse(input: List<Token>): Pair<Int, ReturnStatement>? {
-            val (size, result) = input.search(
+            val (size, _, value, _) = input.search(
                 TokenType.RETURN,
                 TokenType.SEARCH_GROUP,
                 TokenType.SEMICOLON
             ) ?: return null
-            val (_, value, _) = result
 
             return size to ReturnStatement(
                 Parser.parseStatement(value).second

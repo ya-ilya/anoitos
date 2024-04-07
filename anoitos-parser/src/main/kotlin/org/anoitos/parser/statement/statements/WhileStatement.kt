@@ -13,7 +13,7 @@ data class WhileStatement(
 ) : Statement {
     companion object : StatementParser<WhileStatement> {
         override fun parse(input: List<Token>): Pair<Int, WhileStatement>? {
-            val (size, result) = input.search(
+            val (size, _, _, condition, _, _, body, _) = input.search(
                 TokenType.WHILE,
                 TokenType.LPAREN,
                 TokenType.SEARCH_GROUP,
@@ -22,7 +22,6 @@ data class WhileStatement(
                 TokenType.SEARCH_GROUP,
                 TokenType.RBRACE
             ) ?: return null
-            val (_, _, condition, _, _, body, _) = result
 
             return size to WhileStatement(
                 Parser.parseStatement(condition).second,

@@ -3,7 +3,7 @@ package org.anoitos.parser.extensions
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 
-fun List<Token>.search(vararg types: TokenType): Pair<Int, ExtendedComponentsList<List<Token>>>? {
+fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
     if (types.filter { it != TokenType.SEARCH_GROUP }.size > this.size) {
         return null
     }
@@ -73,14 +73,21 @@ fun List<Token>.search(vararg types: TokenType): Pair<Int, ExtendedComponentsLis
         tokenIndex++
     }
 
-    return size to ExtendedComponentsList(result)
+    return SearchResult(size, result)
 }
 
-class ExtendedComponentsList<T>(collection: Collection<T>) : ArrayList<T>(collection) {
-    operator fun component6() = this[5]
-    operator fun component7() = this[6]
-    operator fun component8() = this[7]
-    operator fun component9() = this[8]
-    operator fun component10() = this[9]
-    operator fun component11() = this[10]
+class SearchResult<T>(val size: Int, val result: List<T>) {
+    operator fun component1() = size
+    operator fun component2() = result[0]
+    operator fun component3() = result[1]
+    operator fun component4() = result[2]
+    operator fun component5() = result[3]
+    operator fun component6() = result[4]
+    operator fun component7() = result[5]
+    operator fun component8() = result[6]
+    operator fun component9() = result[7]
+    operator fun component10() = result[8]
+    operator fun component11() = result[9]
+    operator fun component12() = result[10]
+    operator fun component13() = result[11]
 }

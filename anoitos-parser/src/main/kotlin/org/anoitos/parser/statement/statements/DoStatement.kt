@@ -10,7 +10,7 @@ import org.anoitos.parser.statement.StatementParser
 data class DoStatement(val condition: Statement, val body: BlockStatement) : Statement {
     companion object : StatementParser<DoStatement> {
         override fun parse(input: List<Token>): Pair<Int, DoStatement>? {
-            val (size, result) = input.search(
+            val (size, _, _, body, _, _, _, condition, _) = input.search(
                 TokenType.DO,
                 TokenType.LBRACE,
                 TokenType.SEARCH_GROUP,
@@ -20,7 +20,6 @@ data class DoStatement(val condition: Statement, val body: BlockStatement) : Sta
                 TokenType.SEARCH_GROUP,
                 TokenType.RPAREN,
             ) ?: return null
-            val (_, _, body, _, _, _, condition, _) = result
 
             return size to DoStatement(
                 Parser.parseStatement(condition).second,

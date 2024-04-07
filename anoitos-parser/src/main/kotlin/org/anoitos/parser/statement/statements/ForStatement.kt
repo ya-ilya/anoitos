@@ -16,7 +16,7 @@ data class ForStatement(
 ) : Statement {
     companion object : StatementParser<ForStatement> {
         override fun parse(input: List<Token>): Pair<Int, ForStatement>? {
-            val (size, result) = input.search(
+            val (size, _, _, identifier, _, from, _, to, _, _, body, _) = input.search(
                 TokenType.FOR,
                 TokenType.LPAREN,
                 TokenType.ID,
@@ -29,7 +29,6 @@ data class ForStatement(
                 TokenType.SEARCH_GROUP,
                 TokenType.RBRACE
             ) ?: return null
-            val (_, _, identifier, _, from, _, to, _, _, body, _) = result
 
             return size to ForStatement(
                 IdentifierExpression.parse(identifier)!!.second,

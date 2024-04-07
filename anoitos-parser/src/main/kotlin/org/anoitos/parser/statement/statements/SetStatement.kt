@@ -14,13 +14,12 @@ data class SetStatement(
 ) : Statement {
     companion object : StatementParser<SetStatement> {
         override fun parse(input: List<Token>): Pair<Int, SetStatement>? {
-            val (size, result) = input.search(
+            val (size, name, _, value, _) = input.search(
                 TokenType.ID,
                 TokenType.EQUAL,
                 TokenType.SEARCH_GROUP,
                 TokenType.SEMICOLON
             ) ?: return null
-            val (name, _, value, _) = result
 
             return size to SetStatement(
                 IdentifierExpression.parse(name)!!.second,
