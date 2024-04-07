@@ -63,7 +63,7 @@ object Lexer {
             for ((index, char) in input.drop(current).withIndex()) {
                 number += if (char.isDigit()) {
                     char
-                } else if (char == '.' && input.elementAtOrNull(index + 1)?.isDigit() == true) {
+                } else if (char == '.' && input.elementAtOrNull(current + index + 1)?.isDigit() == true) {
                     if (number.contains('.')) {
                         break
                     }

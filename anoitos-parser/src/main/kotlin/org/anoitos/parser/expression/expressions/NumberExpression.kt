@@ -18,8 +18,7 @@ data class NumberExpression(val statements: List<Statement>) : Expression {
             while (index < input.size) {
                 val token = input[index]
 
-                if (token.type == TokenType.INT || token.type == TokenType.DOUBLE
-                ) {
+                if (token.type == TokenType.INT || token.type == TokenType.DOUBLE) {
                     index++
                     result.add(TokenStatement(token))
                 } else {
