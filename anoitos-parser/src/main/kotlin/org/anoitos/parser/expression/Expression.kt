@@ -1,3 +1,7 @@
 package org.anoitos.parser.expression
 
-interface Expression
+import org.anoitos.interpreter.context.Context
+
+interface Expression {
+    fun interpret(context: Context): Any?
+}

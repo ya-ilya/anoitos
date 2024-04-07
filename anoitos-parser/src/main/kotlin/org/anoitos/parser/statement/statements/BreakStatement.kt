@@ -1,5 +1,7 @@
 package org.anoitos.parser.statement.statements
 
+import org.anoitos.interpreter.context.Context
+import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.extensions.search
@@ -16,5 +18,9 @@ class BreakStatement : Statement {
 
             return size to BreakStatement()
         }
+    }
+
+    override fun interpret(context: Context): InterpretResult {
+        return InterpretResult.Break
     }
 }

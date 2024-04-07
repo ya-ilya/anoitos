@@ -1,5 +1,7 @@
 package org.anoitos.parser.statement.statements
 
+import org.anoitos.interpreter.context.Context
+import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
@@ -33,5 +35,33 @@ data class ForEachStatement(
                 BlockStatement.parse(body).second
             )
         }
+    }
+
+    override fun interpret(context: Context): Any? {
+        val valueResult = value.interpret(context)
+
+        if (valueResult is Array<*>) {
+            for (item in valueResult) {
+                val forContext = Context(context)
+                forContext.addVariable(identifier.identifier, item!!)
+                when (val result = body.interpret(forContext)) {
+                    InterpretResult.Break -> break
+                    InterpretResult.Continue -> continue
+                    is InterpretResult.Return -> return result
+                }
+            }
+        } else if (valueResult is Iterable<*>) {
+            for (item in valueResult) {
+                val forContext = Context(context)
+                forContext.addVariable(identifier.identifier, item!!)
+                when (val result = body.interpret(forContext)) {
+                    InterpretResult.Break -> break
+                    InterpretResult.Continue -> continue
+                    is InterpretResult.Return -> return result
+                }
+            }
+        }
+
+        return null
     }
 }

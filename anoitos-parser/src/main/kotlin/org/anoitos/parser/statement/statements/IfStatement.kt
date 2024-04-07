@@ -1,5 +1,6 @@
 package org.anoitos.parser.statement.statements
 
+import org.anoitos.interpreter.context.Context
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
@@ -66,5 +67,23 @@ data class IfStatement(
                 )
             }
         }
+    }
+
+    override fun interpret(context: Context): Any? {
+        if (ifCondition.interpret(context) as Boolean) {
+            return ifBlock.interpret(Context(context))
+        } else {
+            for ((elIfCondition, elIfBlock) in elIfs) {
+                if (elIfCondition.interpret(context) as Boolean) {
+                    return elIfBlock.interpret(Context(context))
+                }
+            }
+
+            if (elseBlock != null) {
+                return elseBlock.interpret(Context(context))
+            }
+        }
+
+        return null
     }
 }

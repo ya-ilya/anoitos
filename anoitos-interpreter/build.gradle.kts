@@ -12,8 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":anoitos-lexer"))
-    implementation(project(":anoitos-interpreter"))
+    implementation(project(":anoitos-parser"))
     testImplementation(kotlin("test"))
 }
 

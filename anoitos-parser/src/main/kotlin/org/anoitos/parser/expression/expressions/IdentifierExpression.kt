@@ -1,5 +1,6 @@
 package org.anoitos.parser.expression.expressions
 
+import org.anoitos.interpreter.context.Context
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.expression.Expression
@@ -16,5 +17,9 @@ data class IdentifierExpression(
 
             return 1 to IdentifierExpression(input[0].value)
         }
+    }
+
+    override fun interpret(context: Context): Any? {
+        return context.getVariable(identifier)
     }
 }

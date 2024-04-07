@@ -10,5 +10,6 @@ pluginManagement {
 
 include(
     "anoitos-lexer",
-    "anoitos-parser"
+    "anoitos-parser",
+    "anoitos-interpreter"
 )

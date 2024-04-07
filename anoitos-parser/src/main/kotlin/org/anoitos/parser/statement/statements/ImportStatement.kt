@@ -1,5 +1,6 @@
 package org.anoitos.parser.statement.statements
 
+import org.anoitos.interpreter.context.Context
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.extensions.search
@@ -25,5 +26,13 @@ data class ImportStatement(
                 paths.filter { it.type != TokenType.COMMA }.map { it.value }
             )
         }
+    }
+
+    override fun interpret(context: Context): Any? {
+        for (path in paths) {
+            context.addImport(path)
+        }
+
+        return null
     }
 }
