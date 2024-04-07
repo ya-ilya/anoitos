@@ -2,7 +2,7 @@ package org.anoitos.interpreter.context
 
 import org.anoitos.interpreter.extensions.interpret
 import org.anoitos.interpreter.library.Library
-import org.anoitos.interpreter.library.libraries.StandardLibrary
+import org.anoitos.interpreter.library.LibraryRegistry
 import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.parser.statement.statements.FunStatement
 
@@ -13,10 +13,7 @@ class Context(private val parent: Context? = null) {
     private val functions = mutableListOf<FunStatement>()
 
     fun addImport(path: String) {
-        when (path) {
-            "standard" -> imports.add(StandardLibrary)
-            else -> throw Exception()
-        }
+        imports.add(LibraryRegistry.libraries[path]!!)
     }
 
     fun addVariable(name: String, value: Any) {
