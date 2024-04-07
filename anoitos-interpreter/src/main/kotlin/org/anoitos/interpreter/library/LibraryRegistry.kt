@@ -1,6 +1,7 @@
 package org.anoitos.interpreter.library
 
 import org.anoitos.interpreter.library.libraries.IOLibrary
+import org.anoitos.interpreter.library.libraries.LogicLibrary
 import org.anoitos.interpreter.library.libraries.MathLibrary
 
 object LibraryRegistry {
@@ -8,6 +9,7 @@ object LibraryRegistry {
 
     init {
         this["io"] = IOLibrary
+        this["logic"] = LogicLibrary
         this["math"] = MathLibrary
     }
 
