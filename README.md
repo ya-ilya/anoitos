@@ -12,7 +12,7 @@ A simple programming language written in Kotlin
 - Add boolean and numeric operations
 - Add more libraries and functions
 
-### Example
+### Examples
 #### Factorial recursive function
 ```
 import 'io', 'logic', 'math';
