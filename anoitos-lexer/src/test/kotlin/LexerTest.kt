@@ -8,32 +8,31 @@ class LexerTest {
     @Test
     fun lexVariable() {
         assertContentEquals(
-            Lexer.lex("var intVariable = 10;"),
             listOf(
                 Token(TokenType.VAR, "var"),
                 Token(TokenType.ID, "intVariable"),
                 Token(TokenType.EQUAL, "="),
                 Token(TokenType.INT, "10"),
                 Token(TokenType.SEMICOLON, ";")
-            )
+            ),
+            Lexer.lex("var intVariable = 10;")
         )
 
         assertContentEquals(
-            Lexer.lex("var stringVariable = 'Simple string';"),
             listOf(
                 Token(TokenType.VAR, "var"),
                 Token(TokenType.ID, "stringVariable"),
                 Token(TokenType.EQUAL, "="),
                 Token(TokenType.STRING, "Simple string"),
                 Token(TokenType.SEMICOLON, ";")
-            )
+            ),
+            Lexer.lex("var stringVariable = 'Simple string';")
         )
     }
 
     @Test
-    fun lexFun() {
+    fun lexFunction() {
         assertContentEquals(
-            Lexer.lex("fun function(parameter) { }"),
             listOf(
                 Token(TokenType.FUN, "fun"),
                 Token(TokenType.ID, "function"),
@@ -42,7 +41,8 @@ class LexerTest {
                 Token(TokenType.RPAREN, ")"),
                 Token(TokenType.LBRACE, "{"),
                 Token(TokenType.RBRACE, "}")
-            )
+            ),
+            Lexer.lex("fun function(parameter) { }")
         )
     }
 }
