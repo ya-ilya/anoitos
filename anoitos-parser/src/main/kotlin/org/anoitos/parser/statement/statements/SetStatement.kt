@@ -1,6 +1,5 @@
 package org.anoitos.parser.statement.statements
 
-import org.anoitos.interpreter.context.Context
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
@@ -27,10 +26,5 @@ data class SetStatement(
                 Parser.parseStatement(value).second
             )
         }
-    }
-
-    override fun interpret(context: Context): Any? {
-        context.setVariable(name.identifier, value.interpret(context)!!)
-        return null
     }
 }

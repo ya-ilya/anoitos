@@ -1,5 +1,6 @@
 package org.anoitos.interpreter.context
 
+import org.anoitos.interpreter.extensions.interpret
 import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.parser.statement.statements.FunStatement
 

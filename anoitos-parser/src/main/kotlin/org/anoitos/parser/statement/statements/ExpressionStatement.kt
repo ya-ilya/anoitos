@@ -1,6 +1,5 @@
 package org.anoitos.parser.statement.statements
 
-import org.anoitos.interpreter.context.Context
 import org.anoitos.lexer.token.Token
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.expression.ExpressionParser
@@ -25,9 +24,5 @@ data class ExpressionStatement(val expression: Expression) : Statement {
 
             return null
         }
-    }
-
-    override fun interpret(context: Context): Any? {
-        return expression.interpret(context)
     }
 }

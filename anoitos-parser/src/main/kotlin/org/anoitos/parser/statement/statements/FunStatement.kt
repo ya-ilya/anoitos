@@ -1,7 +1,5 @@
 package org.anoitos.parser.statement.statements
 
-import org.anoitos.interpreter.context.Context
-import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.extensions.search
@@ -38,10 +36,5 @@ data class FunStatement(
                 BlockStatement.parse(body).second
             )
         }
-    }
-
-    override fun interpret(context: Context): InterpretResult? {
-        context.addFunction(this)
-        return null
     }
 }

@@ -1,7 +1,5 @@
 package org.anoitos.parser.statement.statements
 
-import org.anoitos.interpreter.context.Context
-import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
@@ -30,17 +28,5 @@ data class WhileStatement(
                 BlockStatement.parse(body).second
             )
         }
-    }
-
-    override fun interpret(context: Context): Any? {
-        while (condition.interpret(context) as Boolean) {
-            when (val result = body.interpret(Context(context))) {
-                InterpretResult.Break -> break
-                InterpretResult.Continue -> continue
-                is InterpretResult.Return -> return result
-            }
-        }
-
-        return null
     }
 }

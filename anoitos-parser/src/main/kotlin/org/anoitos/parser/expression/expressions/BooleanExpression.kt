@@ -1,6 +1,5 @@
 package org.anoitos.parser.expression.expressions
 
-import org.anoitos.interpreter.context.Context
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.expression.Expression
@@ -55,28 +54,5 @@ data class BooleanExpression(
                 )
             }
         }
-    }
-
-    override fun interpret(context: Context): Any {
-        val tokens = mutableListOf<Token>()
-
-        for (statement in statements) {
-            when (statement) {
-                is TokenStatement -> tokens.add(statement.token)
-
-                is CallStatement, is ExpressionStatement -> {
-                    val result = (statement.interpret(context) as Boolean)
-
-                    tokens.add(
-                        Token(
-                            if (result) TokenType.TRUE else TokenType.FALSE,
-                            result.toString(),
-                        )
-                    )
-                }
-            }
-        }
-
-        return tokens[0].value.toBooleanStrict()
     }
 }

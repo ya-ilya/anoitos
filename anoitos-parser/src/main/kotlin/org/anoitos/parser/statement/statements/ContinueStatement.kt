@@ -1,7 +1,5 @@
 package org.anoitos.parser.statement.statements
 
-import org.anoitos.interpreter.context.Context
-import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.extensions.search
@@ -18,9 +16,5 @@ class ContinueStatement : Statement {
 
             return size to ContinueStatement()
         }
-    }
-
-    override fun interpret(context: Context): InterpretResult {
-        return InterpretResult.Continue
     }
 }

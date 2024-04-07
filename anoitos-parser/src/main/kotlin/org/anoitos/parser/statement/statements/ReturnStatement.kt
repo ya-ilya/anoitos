@@ -1,7 +1,5 @@
 package org.anoitos.parser.statement.statements
 
-import org.anoitos.interpreter.context.Context
-import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
@@ -24,9 +22,5 @@ data class ReturnStatement(
                 Parser.parseStatement(value).second
             )
         }
-    }
-
-    override fun interpret(context: Context): InterpretResult {
-        return InterpretResult.Return(value.interpret(context))
     }
 }

@@ -1,6 +1,5 @@
 package org.anoitos.parser.statement.statements
 
-import org.anoitos.interpreter.context.Context
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
@@ -50,12 +49,5 @@ data class CallStatement(
                 argumentStatements
             )
         }
-    }
-
-    override fun interpret(context: Context): Any? {
-        return context.executeFunction(
-            name.value,
-            arguments.map { it.interpret(context)!! }
-        )
     }
 }
