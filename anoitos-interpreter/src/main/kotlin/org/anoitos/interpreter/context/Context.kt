@@ -4,12 +4,14 @@ import org.anoitos.interpreter.extensions.interpret
 import org.anoitos.interpreter.library.Library
 import org.anoitos.interpreter.library.LibraryRegistry
 import org.anoitos.interpreter.result.InterpretResult
+import org.anoitos.parser.statement.statements.ClassStatement
 import org.anoitos.parser.statement.statements.FunStatement
 
 class Context(private val parent: Context? = null) {
     private var isFunContext: Boolean = false
     private val imports = mutableListOf<Library>()
     private val variables = mutableMapOf<String, Any>()
+    private val classes = mutableMapOf<String, Context>()
     private val functions = mutableListOf<FunStatement>()
 
     fun addImport(path: String) {
@@ -30,6 +32,21 @@ class Context(private val parent: Context? = null) {
                 break
             } else {
                 parent = parent.parent
+            }
+        }
+    }
+
+    fun addClass(classStatement: ClassStatement) {
+        if (getClass(classStatement.name.value) != null) {
+            throw Exception()
+        }
+        classes[classStatement.name.value] = Context(this).also {
+            for (funStatement in classStatement.functions) {
+                it.addFunction(funStatement)
+            }
+
+            for (varStatement in classStatement.variables) {
+                it.addVariable(varStatement.name.value, varStatement.value.interpret(it)!!)
             }
         }
     }
@@ -93,12 +110,15 @@ class Context(private val parent: Context? = null) {
 
         return when (val result = function.body.interpret(context)) {
             is InterpretResult.Return -> result.value
-            else -> result
+            else -> null
         }
     }
 
     fun getVariable(name: String): Any? =
         variables.getOrDefault(name, parent?.getVariable(name))
+
+    fun getClass(name: String): Context? =
+        classes[name] ?: parent?.getClass(name)
 
     fun getFunction(name: String): FunStatement? =
         functions.firstOrNull { it.name.value == name } ?: parent?.getFunction(name)

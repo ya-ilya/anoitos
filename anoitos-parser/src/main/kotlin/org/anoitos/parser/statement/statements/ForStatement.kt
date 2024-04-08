@@ -2,14 +2,13 @@ package org.anoitos.parser.statement.statements
 
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
-import org.anoitos.parser.expression.expressions.IdentifierExpression
 import org.anoitos.parser.expression.expressions.NumberExpression
 import org.anoitos.parser.extensions.search
 import org.anoitos.parser.statement.Statement
 import org.anoitos.parser.statement.StatementParser
 
 data class ForStatement(
-    val identifier: IdentifierExpression,
+    val identifier: Token,
     val from: NumberExpression,
     val to: NumberExpression,
     val body: BlockStatement
@@ -31,7 +30,7 @@ data class ForStatement(
             ) ?: return null
 
             return size to ForStatement(
-                IdentifierExpression.parse(identifier)!!.second,
+                identifier[0],
                 NumberExpression.parse(from)!!.second,
                 NumberExpression.parse(to)!!.second,
                 BlockStatement.parse(body).second

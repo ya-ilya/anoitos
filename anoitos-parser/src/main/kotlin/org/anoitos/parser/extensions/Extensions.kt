@@ -49,6 +49,7 @@ fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
                         result.add(listOf())
                         result.add(listOf(token))
                         size++
+                        typeIndex += 2
                         tokenIndex++
                     } else {
                         inGroup = true
@@ -71,6 +72,10 @@ fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
         }
 
         tokenIndex++
+    }
+
+    if (types.size != result.size) {
+        return null
     }
 
     return SearchResult(size, result)

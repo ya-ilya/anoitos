@@ -5,6 +5,7 @@ enum class TokenType(
     val value: String = "",
     val group: TokenGroup = TokenGroup.OTHER
 ) {
+    CLASS("class", TokenGroup.KEYWORD),
     VAR("var", TokenGroup.KEYWORD),
     FUN("fun", TokenGroup.KEYWORD),
     RETURN("return", TokenGroup.KEYWORD),

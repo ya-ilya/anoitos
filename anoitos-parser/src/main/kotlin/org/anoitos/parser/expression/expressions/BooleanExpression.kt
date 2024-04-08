@@ -20,12 +20,12 @@ data class BooleanExpression(
             while (index < input.size) {
                 val token = input[index]
 
-                if (token.type == TokenType.TRUE || token.type == TokenType.FALSE
-                ) {
+                if (token.type == TokenType.TRUE || token.type == TokenType.FALSE) {
                     index++
                     result.add(TokenStatement(token))
                 } else {
-                    val callStatement = CallStatement.parse(input.drop(index))
+                    val statementInput = input.drop(index)
+                    val callStatement = CallStatement.parse(statementInput)
 
                     if (callStatement?.second != null) {
                         index += callStatement.first
@@ -33,10 +33,16 @@ data class BooleanExpression(
                         continue
                     }
 
-                    val expressionStatement =
-                        ExpressionStatement.parse(input.drop(index), listOf(NumberExpression, BooleanExpression))
+                    val expressionStatement = ExpressionStatement.parse(
+                        statementInput,
+                        listOf(
+                            BooleanExpression,
+                            NumberExpression,
+                            StringExpression
+                        )
+                    )
 
-                    if (expressionStatement?.second != null && expressionStatement.second.expression is IdentifierExpression) {
+                    if (expressionStatement?.second != null && expressionStatement.second.expression is PathExpression) {
                         index += expressionStatement.first
                         result.add(expressionStatement.second)
                         continue
@@ -46,7 +52,7 @@ data class BooleanExpression(
                 }
             }
 
-            return if (result.size == 0 || (result.size == 1 && result[0] is ExpressionStatement && (result[0] as ExpressionStatement).expression is IdentifierExpression)) {
+            return if (result.size == 0 || (result.size == 1 && result[0] is ExpressionStatement && (result[0] as ExpressionStatement).expression is PathExpression)) {
                 null
             } else {
                 index to BooleanExpression(

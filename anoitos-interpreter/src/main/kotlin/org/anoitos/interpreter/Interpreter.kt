@@ -21,7 +21,7 @@ object Interpreter {
             val result = statement.interpret(context)
 
             if (result is InterpretResult.Return) {
-                return result.value
+                return result
             }
         }
 

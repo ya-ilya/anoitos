@@ -13,7 +13,7 @@ object ForEachInterpreter : StatementInterpreter<ForEachStatement> {
         if (valueResult is Array<*>) {
             for (item in valueResult) {
                 val forContext = Context(context)
-                forContext.addVariable(statement.identifier.identifier, item!!)
+                forContext.addVariable(statement.identifier.value, item!!)
                 when (val result = statement.body.interpret(forContext)) {
                     InterpretResult.Break -> break
                     InterpretResult.Continue -> continue
@@ -23,7 +23,7 @@ object ForEachInterpreter : StatementInterpreter<ForEachStatement> {
         } else if (valueResult is Iterable<*>) {
             for (item in valueResult) {
                 val forContext = Context(context)
-                forContext.addVariable(statement.identifier.identifier, item!!)
+                forContext.addVariable(statement.identifier.value, item!!)
                 when (val result = statement.body.interpret(forContext)) {
                     InterpretResult.Break -> break
                     InterpretResult.Continue -> continue

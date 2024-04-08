@@ -33,7 +33,7 @@ data class NumberExpression(val statements: List<Statement>) : Expression {
                     val expressionStatement =
                         ExpressionStatement.parse(input.drop(index), listOf(NumberExpression, BooleanExpression))
 
-                    if (expressionStatement?.second != null && expressionStatement.second.expression is IdentifierExpression) {
+                    if (expressionStatement?.second != null && expressionStatement.second.expression is PathExpression) {
                         index += expressionStatement.first
                         result.add(expressionStatement.second)
                         continue
@@ -43,7 +43,7 @@ data class NumberExpression(val statements: List<Statement>) : Expression {
                 }
             }
 
-            return if (result.size == 0 || (result.size == 1 && result[0] is ExpressionStatement && (result[0] as ExpressionStatement).expression is IdentifierExpression)) {
+            return if (result.size == 0 || (result.size == 1 && result[0] is ExpressionStatement && (result[0] as ExpressionStatement).expression is PathExpression)) {
                 null
             } else {
                 index to NumberExpression(result)

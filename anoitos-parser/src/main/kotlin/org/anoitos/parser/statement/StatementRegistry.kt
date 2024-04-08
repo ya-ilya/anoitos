@@ -7,6 +7,7 @@ object StatementRegistry {
         VarStatement,
         FunStatement,
         CallStatement,
+        ClassStatement,
         ReturnStatement,
         ImportStatement,
         IfStatement,

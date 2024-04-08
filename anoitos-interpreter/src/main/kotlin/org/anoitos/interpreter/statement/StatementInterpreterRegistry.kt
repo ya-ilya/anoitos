@@ -8,6 +8,7 @@ object StatementInterpreterRegistry {
         BlockStatement::class to BlockInterpreter,
         BreakStatement::class to BreakInterpreter,
         CallStatement::class to CallInterpreter,
+        ClassStatement::class to ClassInterpreter,
         ContinueStatement::class to ContinueInterpreter,
         DoStatement::class to DoInterpreter,
         EmptyStatement::class to EmptyInterpreter,

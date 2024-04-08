@@ -12,13 +12,13 @@ object ForInterpreter : StatementInterpreter<ForStatement> {
         val to = statement.to.interpret(context) as Int
         while (index <= to) {
             val forContext = Context(context)
-            forContext.addVariable(statement.identifier.identifier, index)
+            forContext.addVariable(statement.identifier.value, index)
             when (val result = statement.body.interpret(forContext)) {
                 InterpretResult.Break -> break
                 InterpretResult.Continue -> continue
                 is InterpretResult.Return -> return result
             }
-            index = forContext.getVariable(statement.identifier.identifier) as Int + 1
+            index = forContext.getVariable(statement.identifier.value) as Int + 1
         }
 
         return null
