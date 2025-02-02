@@ -8,8 +8,8 @@ import org.anoitos.parser.statement.statements.ForStatement
 
 object ForInterpreter : StatementInterpreter<ForStatement> {
     override fun interpret(statement: ForStatement, context: Context): Any? {
-        var index = statement.from.interpret(context) as Int
-        val to = statement.to.interpret(context) as Int
+        var index = (statement.from.interpret(context) as Number).toInt()
+        val to = (statement.to.interpret(context) as Number).toInt()
         while (index <= to) {
             val forContext = Context(context)
             forContext.addVariable(statement.identifier.value, index)

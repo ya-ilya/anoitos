@@ -12,6 +12,8 @@ A simple programming language written in Kotlin
 - ~~Add boolean and numeric operations~~
 - Add more libraries and functions
 - Implement EQUALS operation for different types
+- Implement lists
+- Add more tests
 
 ### Examples
 #### Factorial recursive function
