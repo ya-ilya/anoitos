@@ -10,16 +10,16 @@ import org.anoitos.parser.statement.statements.FunStatement
 class Context(private val parent: Context? = null) {
     private var isFunContext: Boolean = false
     private val imports = mutableListOf<Library>()
-    private val variables = mutableMapOf<String, Any>()
+    val variables = mutableMapOf<String, Any>()
     private val classes = mutableMapOf<String, Context>()
-    private val functions = mutableListOf<FunStatement>()
+    val functions = mutableListOf<FunStatement>()
 
     fun addImport(path: String) {
         imports.add(LibraryRegistry.libraries[path]!!)
     }
 
     fun addVariable(name: String, value: Any) {
-        check(getVariable(name) == null)
+        check(getVariable(name) == null) { "Variable '$name' already exists" }
         variables[name] = value
     }
 
@@ -29,16 +29,18 @@ class Context(private val parent: Context? = null) {
         while (parent != null) {
             if (parent.variables.containsKey(name)) {
                 parent.variables[name] = value
-                break
+                return
             } else {
                 parent = parent.parent
             }
         }
+
+        throw IllegalStateException("Variable '$name' not found")
     }
 
     fun addClass(classStatement: ClassStatement) {
         if (getClass(classStatement.name.value) != null) {
-            throw Exception()
+            throw IllegalStateException("Class '${classStatement.name.value}' not found")
         }
         classes[classStatement.name.value] = Context(this).also {
             for (funStatement in classStatement.functions) {
@@ -53,22 +55,12 @@ class Context(private val parent: Context? = null) {
 
     fun addFunction(funStatement: FunStatement) {
         if (getFunction(funStatement.name.value) != null) {
-            throw Exception()
+            throw IllegalStateException("Function '${funStatement.name.value}' not found")
         }
         functions.add(funStatement)
     }
 
     fun executeFunction(name: String, arguments: List<Any>): Any? {
-        var funParent = this
-        var parent: Context? = parent
-        while (parent != null) {
-            if (parent.isFunContext) {
-                funParent = parent.parent!!
-            }
-
-            parent = parent.parent
-        }
-
         val function = getFunction(name)
 
         if (function == null) {
@@ -96,9 +88,19 @@ class Context(private val parent: Context? = null) {
                     is InterpretResult.Return -> result.value
                     else -> null
                 }
-            } else {
-                throw Exception()
             }
+
+            throw IllegalStateException("Method '${name}' not found")
+        }
+
+        var funParent = this
+        var parent: Context? = parent
+        while (parent != null) {
+            if (parent.isFunContext) {
+                funParent = parent.parent!!
+            }
+
+            parent = parent.parent
         }
 
         val context = Context(funParent)

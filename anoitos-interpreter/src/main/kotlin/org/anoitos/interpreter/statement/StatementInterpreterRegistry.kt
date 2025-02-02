@@ -18,6 +18,7 @@ object StatementInterpreterRegistry {
         FunStatement::class to FunInterpreter,
         IfStatement::class to IfInterpreter,
         ImportStatement::class to ImportInterpreter,
+        NewStatement::class to NewInterpreter,
         ReturnStatement::class to ReturnInterpreter,
         SetStatement::class to SetInterpreter,
         TokenStatement::class to TokenInterpreter,

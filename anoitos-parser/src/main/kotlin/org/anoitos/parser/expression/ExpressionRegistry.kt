@@ -7,9 +7,9 @@ import org.anoitos.parser.expression.expressions.StringExpression
 
 object ExpressionRegistry {
     val expressions = listOf(
-        PathExpression,
-        BooleanExpression,
+        StringExpression,
         NumberExpression,
-        StringExpression
+        BooleanExpression,
+        PathExpression
     )
 }

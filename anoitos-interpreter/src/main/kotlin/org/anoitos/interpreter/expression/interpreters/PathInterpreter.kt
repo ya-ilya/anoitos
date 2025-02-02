@@ -30,7 +30,7 @@ object PathInterpreter : ExpressionInterpreter<PathExpression> {
                         break
                     }
 
-                    throw Exception()
+                    throw IllegalStateException("Unknown token type")
                 }
 
                 is CallStatement -> {

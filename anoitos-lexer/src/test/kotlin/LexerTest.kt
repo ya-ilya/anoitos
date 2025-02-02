@@ -12,7 +12,7 @@ class LexerTest {
                 Token(TokenType.VAR, "var"),
                 Token(TokenType.ID, "intVariable"),
                 Token(TokenType.EQUAL, "="),
-                Token(TokenType.INT, "10"),
+                Token(TokenType.NUMBER, "10"),
                 Token(TokenType.SEMICOLON, ";")
             ),
             Lexer.lex("var intVariable = 10;")

@@ -5,19 +5,20 @@ import org.anoitos.parser.statement.statements.*
 object StatementRegistry {
     val statements = arrayOf(
         VarStatement,
+        SetStatement,
+        ExpressionStatement,
         FunStatement,
-        CallStatement,
         ClassStatement,
         ReturnStatement,
-        ImportStatement,
         IfStatement,
         ForStatement,
         ForEachStatement,
         WhileStatement,
         DoStatement,
-        SetStatement,
-        ExpressionStatement,
         BreakStatement,
-        ContinueStatement
+        ContinueStatement,
+        ImportStatement,
+        NewStatement,
+        CallStatement
     )
 }

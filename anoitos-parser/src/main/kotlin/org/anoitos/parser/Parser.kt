@@ -37,6 +37,6 @@ object Parser {
             }
         }
 
-        throw Exception()
+        throw IllegalStateException("No valid statement found for the given input")
     }
 }

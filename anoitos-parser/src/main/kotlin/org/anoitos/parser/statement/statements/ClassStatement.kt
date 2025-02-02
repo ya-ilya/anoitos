@@ -25,7 +25,7 @@ data class ClassStatement(
             val bodyStatements = Parser.parse(body)
 
             if (bodyStatements.any { it !is VarStatement && it !is FunStatement }) {
-                throw Exception()
+                throw IllegalStateException("BodyStatement can contain only VarSarStatement and FunStatement")
             }
 
             return size to ClassStatement(

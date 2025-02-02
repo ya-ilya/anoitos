@@ -15,17 +15,23 @@ object SetInterpreter : StatementInterpreter<SetStatement> {
                 val variable = currentContext.getVariable(pathStatement.token.value)
 
                 if (variable != null) {
-                    currentContext.setVariable(pathStatement.token.value, statement.value.interpret(context)!!)
-                    break
+                    if (variable is Context) {
+                        currentContext = variable
+                        continue
+                    } else {
+                        currentContext.setVariable(pathStatement.token.value, statement.value.interpret(context)!!)
+                        break
+                    }
                 }
 
                 val classContext = currentContext.getClass(pathStatement.token.value)
 
                 if (classContext != null) {
                     currentContext = classContext
-                } else {
-                    throw Exception()
+                    continue
                 }
+
+                throw IllegalStateException("Variable or class '${pathStatement.token.value}' not found")
             }
         }
 

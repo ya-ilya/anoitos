@@ -9,22 +9,23 @@
 A simple programming language written in Kotlin
 
 ### TODO
-- Add boolean and numeric operations
+- ~~Add boolean and numeric operations~~
 - Add more libraries and functions
+- Implement EQUALS operation for different types
 
 ### Examples
 #### Factorial recursive function
 ```
-import 'io', 'logic', 'math';
+import 'io', 'logic';
 
 fun factorial(n) {
-    if (or(equals(n, 0), equals(n, 1))) {
+    if (equals(n, 0) || equals(n, 1)) {
         return 1;
     } else {
-        return multiply(n, factorial(minus(n, 1)));
+        return n * factorial(n - 1);
     }
 }
-            
+
 println(factorial(5));
 ```
-Output: 120
+Output: 120.0

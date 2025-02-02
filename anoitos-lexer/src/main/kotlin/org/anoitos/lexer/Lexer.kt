@@ -58,7 +58,6 @@ object Lexer {
 
         if (input[current].isDigit()) {
             var number = ""
-            var type = TokenType.INT
 
             for ((index, char) in input.drop(current).withIndex()) {
                 number += if (char.isDigit()) {
@@ -68,14 +67,13 @@ object Lexer {
                         break
                     }
 
-                    type = TokenType.DOUBLE
                     char
                 } else {
                     break
                 }
             }
 
-            return (current + number.length to Token(type, number))
+            return (current + number.length to Token(TokenType.NUMBER, number))
         }
 
         val inputFromCurrent = input.drop(current)
@@ -94,6 +92,6 @@ object Lexer {
             return (current + identifier.length to Token(TokenType.ID, identifier))
         }
 
-        throw Exception("Unknown token ${input[current]} at position $current in $input")
+        throw IllegalStateException("Unknown token ${input[current]} at position $current in $input")
     }
 }

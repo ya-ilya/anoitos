@@ -43,8 +43,8 @@ fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
                 group.clear()
             }
         } else {
-            when {
-                type == TokenType.SEARCH_GROUP -> {
+            when (type) {
+                TokenType.SEARCH_GROUP -> {
                     if (token.type == types.elementAtOrNull(typeIndex + 1)) {
                         result.add(listOf())
                         result.add(listOf(token))
@@ -57,15 +57,11 @@ fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
 
                     continue
                 }
-
-                type != token.type -> {
-                    return null
-                }
-
-                else -> {
+                token.type -> {
                     result.add(listOf(token))
                     size++
                 }
+                else -> return null
             }
 
             typeIndex++
@@ -74,11 +70,11 @@ fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
         tokenIndex++
     }
 
-    if (types.size != result.size) {
-        return null
+    return if (typeIndex == types.size) {
+        SearchResult(size, result)
+    } else {
+        null
     }
-
-    return SearchResult(size, result)
 }
 
 class SearchResult<T>(val size: Int, val result: List<T>) {

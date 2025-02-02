@@ -16,36 +16,40 @@ data class PathExpression(
             val statements = mutableListOf<Statement>()
             var size = 0
 
-            do {
+            while (size < input.size) {
                 var found = false
-                val callStatement = CallStatement.parse(input.drop(size))
 
-                if (callStatement != null && withCallStatements) {
-                    statements.add(callStatement.second)
-                    size += callStatement.first
-                    found = true
-                } else {
-                    val tokenStatement = TokenStatement(input[size])
-
-                    if (tokenStatement.token.type == TokenType.ID) {
-                        statements.add(tokenStatement)
-                        size += 1
+                if (withCallStatements) {
+                    val callStatement = CallStatement.parse(input.drop(size))
+                    if (callStatement != null) {
+                        statements.add(callStatement.second)
+                        size += callStatement.first
                         found = true
                     }
+                }
+
+                if (!found && input[size].type == TokenType.ID) {
+                    statements.add(TokenStatement(input[size]))
+                    size++
+                    found = true
                 }
 
                 if (!found) {
                     return null
                 }
 
-                if (input.drop(size).getOrNull(0)?.type == TokenType.DOT) {
+                if (size < input.size && input[size].type == TokenType.DOT) {
                     size++
                 } else {
                     break
                 }
-            } while (true)
+            }
 
-            return size to PathExpression(statements)
+            return if (!statements.any { it is TokenStatement }) {
+                null
+            } else {
+                size to PathExpression(statements)
+            }
         }
 
         override fun parse(input: List<Token>): Pair<Int, PathExpression>? {

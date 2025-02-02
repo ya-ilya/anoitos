@@ -6,16 +6,20 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class InterpreterTest {
-    @Test
-    fun interpret() {
-        val tokens = Lexer.lex("var variable = 10; variable = 20;")
+    private fun interpret(text: String): Pair<Context, Any?> {
+        val tokens = Lexer.lex(text)
         val statements = Parser.parse(tokens)
         val context = Context()
 
-        Interpreter.interpret(statements, context)
+        return context to Interpreter.interpret(statements, context)
+    }
+
+    @Test
+    fun interpret() {
+        val (context, _) = interpret("var variable = 10; variable = 20;")
 
         assertEquals(
-            20,
+            20.0,
             context.getVariable("variable")
         )
     }

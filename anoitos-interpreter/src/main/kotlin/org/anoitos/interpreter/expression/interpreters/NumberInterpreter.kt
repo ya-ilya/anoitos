@@ -19,14 +19,81 @@ object NumberInterpreter : ExpressionInterpreter<NumberExpression> {
                 is TokenStatement -> tokens.add(statement.token)
 
                 is CallStatement, is ExpressionStatement -> {
-                    val result = statement.interpret(context)
-                    val type = if (result is Double) TokenType.DOUBLE else TokenType.INT
+                    val result = (statement.interpret(context) as Number)
 
-                    tokens.add(Token(type, result.toString()))
+                    tokens.add(
+                        Token(
+                            TokenType.NUMBER,
+                            result.toString(),
+                        )
+                    )
                 }
             }
         }
 
-        return if (tokens[0].type == TokenType.DOUBLE) tokens[0].value.toDouble() else tokens[0].value.toInt()
+        return evaluateNumberExpression(tokens)
+    }
+
+    private fun evaluateNumberExpression(tokens: List<Token>): Number {
+        val valuesStack = mutableListOf<Double>()
+        val operatorsStack = mutableListOf<TokenType>()
+
+        fun applyOperator() {
+            when (val operator = operatorsStack.removeLast()) {
+                TokenType.PLUS -> {
+                    val right = valuesStack.removeLast()
+                    val left = valuesStack.removeLast()
+                    valuesStack.add(left + right)
+                }
+
+                TokenType.MINUS -> {
+                    val right = valuesStack.removeLast()
+                    val left = valuesStack.removeLast()
+                    valuesStack.add(left - right)
+                }
+
+                TokenType.MULTIPLY -> {
+                    val right = valuesStack.removeLast()
+                    val left = valuesStack.removeLast()
+                    valuesStack.add(left * right)
+                }
+
+                TokenType.DIVIDE -> {
+                    val right = valuesStack.removeLast()
+                    val left = valuesStack.removeLast()
+                    valuesStack.add(left / right)
+                }
+
+                else -> throw IllegalStateException("Unexpected operator: $operator")
+            }
+        }
+
+        for (token in tokens) {
+            when (token.type) {
+                TokenType.NUMBER -> valuesStack.add(token.value.toDouble())
+                TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE -> operatorsStack.add(token.type)
+                TokenType.LPAREN -> operatorsStack.add(token.type)
+                TokenType.RPAREN -> {
+                    while (operatorsStack.isNotEmpty() && operatorsStack.last() != TokenType.LPAREN) {
+                        applyOperator()
+                    }
+                    if (operatorsStack.isEmpty() || operatorsStack.removeLast() != TokenType.LPAREN) {
+                        throw IllegalStateException("Mismatched parentheses")
+                    }
+                }
+
+                else -> throw IllegalStateException("Unexpected token: ${token.type}")
+            }
+        }
+
+        while (operatorsStack.isNotEmpty()) {
+            applyOperator()
+        }
+
+        if (valuesStack.size != 1) {
+            throw IllegalStateException("Invalid number expression")
+        }
+
+        return valuesStack.single()
     }
 }

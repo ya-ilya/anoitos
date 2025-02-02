@@ -9,7 +9,9 @@ import org.anoitos.parser.statement.statements.CallStatement
 import org.anoitos.parser.statement.statements.ExpressionStatement
 import org.anoitos.parser.statement.statements.TokenStatement
 
-data class NumberExpression(val statements: List<Statement>) : Expression {
+data class NumberExpression(
+    val statements: List<Statement>
+) : Expression {
     companion object : ExpressionParser<NumberExpression> {
         override fun parse(input: List<Token>): Pair<Int, NumberExpression>? {
             val result = mutableListOf<Statement>()
@@ -18,36 +20,119 @@ data class NumberExpression(val statements: List<Statement>) : Expression {
             while (index < input.size) {
                 val token = input[index]
 
-                if (token.type == TokenType.INT || token.type == TokenType.DOUBLE) {
-                    index++
-                    result.add(TokenStatement(token))
-                } else {
-                    val callStatement = CallStatement.parse(input.drop(index))
-
-                    if (callStatement?.second != null) {
-                        index += callStatement.first
-                        result.add(callStatement.second)
-                        continue
+                when (token.type) {
+                    TokenType.NUMBER -> {
+                        index++
+                        result.add(TokenStatement(token))
                     }
 
-                    val expressionStatement =
-                        ExpressionStatement.parse(input.drop(index), listOf(NumberExpression, BooleanExpression))
-
-                    if (expressionStatement?.second != null && expressionStatement.second.expression is PathExpression) {
-                        index += expressionStatement.first
-                        result.add(expressionStatement.second)
-                        continue
+                    TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE -> {
+                        index++
+                        result.add(TokenStatement(token))
                     }
 
-                    break
+                    TokenType.LPAREN -> {
+                        val subExpression = parseSubExpression(input.drop(index + 1))
+                        index += subExpression.first + 2 // +2 to account for the parentheses
+                        result.add(ExpressionStatement(subExpression.second))
+                    }
+
+                    else -> {
+                        val statementInput = input.drop(index)
+                        val callStatement = CallStatement.parse(statementInput)
+
+                        if (callStatement?.second != null) {
+                            index += callStatement.first
+                            result.add(callStatement.second)
+                            continue
+                        }
+
+                        val expressionStatement = ExpressionStatement.parse(
+                            statementInput,
+                            listOf(
+                                BooleanExpression,
+                                NumberExpression,
+                                StringExpression
+                            )
+                        )
+
+                        if (expressionStatement?.second != null && expressionStatement.second.expression is PathExpression) {
+                            index += expressionStatement.first
+                            result.add(expressionStatement.second)
+                            continue
+                        }
+
+                        return null
+                    }
                 }
             }
 
-            return if (result.size == 0 || (result.size == 1 && result[0] is ExpressionStatement && (result[0] as ExpressionStatement).expression is PathExpression)) {
+            return if (result.isEmpty() || !result.any { it is TokenStatement }) {
                 null
             } else {
                 index to NumberExpression(result)
             }
+        }
+
+        private fun parseSubExpression(input: List<Token>): Pair<Int, NumberExpression> {
+            val result = mutableListOf<Statement>()
+            var index = 0
+
+            while (index < input.size) {
+                val token = input[index]
+
+                when (token.type) {
+                    TokenType.NUMBER -> {
+                        index++
+                        result.add(TokenStatement(token))
+                    }
+
+                    TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE -> {
+                        index++
+                        result.add(TokenStatement(token))
+                    }
+
+                    TokenType.LPAREN -> {
+                        val subExpression = parseSubExpression(input.drop(index + 1))
+                        index += subExpression.first + 2 // +2 to account for the parentheses
+                        result.add(ExpressionStatement(subExpression.second))
+                    }
+
+                    TokenType.RPAREN -> {
+                        return index to NumberExpression(result)
+                    }
+
+                    else -> {
+                        val statementInput = input.drop(index)
+                        val callStatement = CallStatement.parse(statementInput)
+
+                        if (callStatement?.second != null) {
+                            index += callStatement.first
+                            result.add(callStatement.second)
+                            continue
+                        }
+
+                        val expressionStatement = ExpressionStatement.parse(
+                            statementInput,
+                            listOf(
+                                BooleanExpression,
+                                NumberExpression,
+                                StringExpression
+                            )
+                        )
+
+                        if (expressionStatement?.second != null && expressionStatement.second.expression is PathExpression) {
+                            index += expressionStatement.first
+                            result.add(expressionStatement.second)
+                            continue
+                        }
+
+                        break
+                    }
+                }
+            }
+
+            throw IllegalStateException("Unmatched parentheses in number expression")
         }
     }
 }
