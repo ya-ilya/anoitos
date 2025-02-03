@@ -35,7 +35,7 @@ object Lexer {
             }
         }
 
-        for (other in TokenType.other) {
+        for (other in TokenType.logicals + TokenType.numerics + TokenType.other) {
             val substring = input.substring(current, input.length)
             if (substring.startsWith(other.value)) {
                 return (current + other.value.length to Token(other, other.value))

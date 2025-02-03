@@ -1,6 +1,7 @@
 package org.anoitos.parser.expression.expressions
 
 import org.anoitos.lexer.token.Token
+import org.anoitos.lexer.token.TokenGroup
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.expression.ExpressionParser
@@ -36,7 +37,7 @@ data class BooleanExpression(
                     }
 
                     TokenType.LPAREN -> {
-                        val subExpression = parseSubExpression(input.drop(index + 1))
+                        val subExpression = parseSubExpression(input.drop(index + 1)) ?: return null
                         index += subExpression.first + 2 // +2 to account for the parentheses
                         result.add(ExpressionStatement(subExpression.second))
                     }
@@ -71,14 +72,14 @@ data class BooleanExpression(
                 }
             }
 
-            return if (result.isEmpty() || !result.any { it is TokenStatement }) {
+            return if (result.isEmpty() || result.none { (it is TokenStatement && it.token.type.group == TokenGroup.LOGICAL) || (it is ExpressionStatement && it.expression is BooleanExpression) }) {
                 null
             } else {
                 index to BooleanExpression(result)
             }
         }
 
-        private fun parseSubExpression(input: List<Token>): Pair<Int, BooleanExpression> {
+        private fun parseSubExpression(input: List<Token>): Pair<Int, BooleanExpression>? {
             val result = mutableListOf<Statement>()
             var index = 0
 
@@ -97,7 +98,7 @@ data class BooleanExpression(
                     }
 
                     TokenType.LPAREN -> {
-                        val subExpression = parseSubExpression(input.drop(index + 1))
+                        val subExpression = parseSubExpression(input.drop(index + 1)) ?: return null
                         index += subExpression.first + 2 // +2 to account for the parentheses
                         result.add(ExpressionStatement(subExpression.second))
                     }
@@ -136,7 +137,7 @@ data class BooleanExpression(
                 }
             }
 
-            throw IllegalStateException("Unmatched parentheses in boolean expression")
+            return null
         }
     }
 }

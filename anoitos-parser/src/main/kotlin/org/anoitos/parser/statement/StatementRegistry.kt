@@ -5,8 +5,6 @@ import org.anoitos.parser.statement.statements.*
 object StatementRegistry {
     val statements = arrayOf(
         VarStatement,
-        SetStatement,
-        ExpressionStatement,
         FunStatement,
         ClassStatement,
         ReturnStatement,
@@ -19,6 +17,8 @@ object StatementRegistry {
         ContinueStatement,
         ImportStatement,
         NewStatement,
+        SetStatement,
+        ExpressionStatement,
         CallStatement
     )
 }

@@ -22,7 +22,7 @@ data class SetStatement(
             ) ?: return null
 
             return size to SetStatement(
-                PathExpression.parse(name, false)!!.second,
+                PathExpression.parse(name)!!.second,
                 Parser.parseStatement(value).second
             )
         }

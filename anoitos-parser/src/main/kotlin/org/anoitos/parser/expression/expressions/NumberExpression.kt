@@ -1,6 +1,7 @@
 package org.anoitos.parser.expression.expressions
 
 import org.anoitos.lexer.token.Token
+import org.anoitos.lexer.token.TokenGroup
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.expression.ExpressionParser
@@ -26,13 +27,13 @@ data class NumberExpression(
                         result.add(TokenStatement(token))
                     }
 
-                    TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE -> {
+                    TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MOD, TokenType.IDIVIDE -> {
                         index++
                         result.add(TokenStatement(token))
                     }
 
                     TokenType.LPAREN -> {
-                        val subExpression = parseSubExpression(input.drop(index + 1))
+                        val subExpression = parseSubExpression(input.drop(index + 1)) ?: return null
                         index += subExpression.first + 2 // +2 to account for the parentheses
                         result.add(ExpressionStatement(subExpression.second))
                     }
@@ -67,14 +68,14 @@ data class NumberExpression(
                 }
             }
 
-            return if (result.isEmpty() || !result.any { it is TokenStatement }) {
+            return if (result.isEmpty() || result.none { (it is TokenStatement && it.token.type.group == TokenGroup.NUMERIC) || (it is ExpressionStatement && it.expression is NumberExpression) }) {
                 null
             } else {
                 index to NumberExpression(result)
             }
         }
 
-        private fun parseSubExpression(input: List<Token>): Pair<Int, NumberExpression> {
+        private fun parseSubExpression(input: List<Token>): Pair<Int, NumberExpression>? {
             val result = mutableListOf<Statement>()
             var index = 0
 
@@ -87,13 +88,13 @@ data class NumberExpression(
                         result.add(TokenStatement(token))
                     }
 
-                    TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE -> {
+                    TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MOD, TokenType.IDIVIDE -> {
                         index++
                         result.add(TokenStatement(token))
                     }
 
                     TokenType.LPAREN -> {
-                        val subExpression = parseSubExpression(input.drop(index + 1))
+                        val subExpression = parseSubExpression(input.drop(index + 1)) ?: return null
                         index += subExpression.first + 2 // +2 to account for the parentheses
                         result.add(ExpressionStatement(subExpression.second))
                     }
@@ -132,7 +133,7 @@ data class NumberExpression(
                 }
             }
 
-            throw IllegalStateException("Unmatched parentheses in number expression")
+            return null
         }
     }
 }

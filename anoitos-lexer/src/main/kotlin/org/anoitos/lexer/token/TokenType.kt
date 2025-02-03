@@ -20,13 +20,23 @@ enum class TokenType(
     DO("do", TokenGroup.KEYWORD),
     IN("in", TokenGroup.KEYWORD),
     IMPORT("import", TokenGroup.KEYWORD),
-    EQUALS("=="),
+
+    EQUALS("==", TokenGroup.LOGICAL),
+    TRUE("true", TokenGroup.LOGICAL),
+    FALSE("false", TokenGroup.LOGICAL),
+    AND("&&", TokenGroup.LOGICAL),
+    OR("||", TokenGroup.LOGICAL),
+    NOT("!", TokenGroup.LOGICAL),
+
+    NUMBER(group = TokenGroup.NUMERIC),
+    PLUS("+", TokenGroup.NUMERIC),
+    MINUS("-", TokenGroup.NUMERIC),
+    MULTIPLY("*", TokenGroup.NUMERIC),
+    IDIVIDE("//", TokenGroup.NUMERIC),
+    DIVIDE("/", TokenGroup.NUMERIC),
+    MOD("%", TokenGroup.NUMERIC),
+
     EQUAL("="),
-    TRUE("true"),
-    FALSE("false"),
-    AND("&&"),
-    OR("||"),
-    NOT("!"),
     LPAREN("("),
     RPAREN(")"),
     LBRACE("{"),
@@ -39,19 +49,16 @@ enum class TokenType(
     COLON(":"),
     AT("@"),
     DOT("."),
-    PLUS("+"),
-    MINUS("-"),
-    MULTIPLY("*"),
-    DIVIDE("/"),
 
     STRING(group = TokenGroup.NONE),
-    NUMBER(group = TokenGroup.NONE),
     EMPTY(group = TokenGroup.NONE),
     ID(group = TokenGroup.NONE),
     SEARCH_GROUP(group = TokenGroup.NONE);
 
     companion object {
-        val keywords = entries.filter { it.group == TokenGroup.KEYWORD }
-        val other = entries.filter { it.group == TokenGroup.OTHER }
+        val keywords = entries.filter { it.group == TokenGroup.KEYWORD && it.value.isNotBlank() }
+        val logicals = entries.filter { it.group == TokenGroup.LOGICAL && it.value.isNotBlank() }
+        val numerics = entries.filter { it.group == TokenGroup.NUMERIC && it.value.isNotBlank() }
+        val other = entries.filter { it.group == TokenGroup.OTHER && it.value.isNotBlank() }
     }
 }

@@ -14,7 +14,10 @@ fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
     var tokenIndex = 0
     val group = mutableListOf<Token>()
     val result = mutableListOf<List<Token>>()
-    var bracesParensAndBrackets = 0
+
+    var braces = 0
+    var parens = 0
+    var brackets = 0
 
     while (typeIndex < types.size && tokenIndex < this.size) {
         val token = this[tokenIndex]
@@ -22,23 +25,26 @@ fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
 
         if (inGroup) {
             when (token.type) {
-                TokenType.LBRACE, TokenType.LPAREN, TokenType.LBRACKET -> {
-                    bracesParensAndBrackets++
-                }
-
-                TokenType.RBRACE, TokenType.RPAREN, TokenType.RBRACKET -> {
-                    bracesParensAndBrackets--
-                }
+                TokenType.LBRACE -> braces++
+                TokenType.RBRACE -> braces--
+                TokenType.LPAREN -> parens++
+                TokenType.RPAREN -> parens--
+                TokenType.LBRACKET -> brackets++
+                TokenType.RBRACKET -> brackets--
 
                 else -> {}
             }
 
             group.add(token)
 
-            if (this.elementAtOrNull(tokenIndex + 1)?.type == types.elementAtOrNull(typeIndex + 1) && bracesParensAndBrackets == 0) {
+            if (
+                this.elementAtOrNull(tokenIndex + 1)?.type == types.elementAtOrNull(typeIndex + 1)
+                && braces == 0
+                && parens == 0
+                && brackets == 0
+            ) {
                 inGroup = false
                 typeIndex++
-                bracesParensAndBrackets = 0
                 result.add(group.toList().also { size += it.size })
                 group.clear()
             }
@@ -57,10 +63,12 @@ fun List<Token>.search(vararg types: TokenType): SearchResult<List<Token>>? {
 
                     continue
                 }
+
                 token.type -> {
                     result.add(listOf(token))
                     size++
                 }
+
                 else -> return null
             }
 

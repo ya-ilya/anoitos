@@ -3,20 +3,19 @@ package org.anoitos.parser.statement.statements
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
-import org.anoitos.parser.expression.expressions.PathExpression
 import org.anoitos.parser.extensions.search
 import org.anoitos.parser.statement.Statement
 import org.anoitos.parser.statement.StatementParser
 
 data class NewStatement(
-    val pathExpression: PathExpression,
+    val name: Token,
     val arguments: List<Statement>
 ) : Statement {
     companion object : StatementParser<NewStatement> {
         override fun parse(input: List<Token>): Pair<Int, NewStatement>? {
-            val (size, _, path, _, arguments, _) = input.search(
+            val (size, _, name, _, arguments, _) = input.search(
                 TokenType.NEW,
-                TokenType.SEARCH_GROUP,
+                TokenType.ID,
                 TokenType.LPAREN,
                 TokenType.SEARCH_GROUP,
                 TokenType.RPAREN
@@ -46,7 +45,7 @@ data class NewStatement(
             }
 
             return size to NewStatement(
-                PathExpression.parse(path, false)!!.second,
+                name[0],
                 argumentStatements
             )
         }

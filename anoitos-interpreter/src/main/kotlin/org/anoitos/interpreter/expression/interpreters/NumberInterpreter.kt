@@ -64,6 +64,18 @@ object NumberInterpreter : ExpressionInterpreter<NumberExpression> {
                     valuesStack.add(left / right)
                 }
 
+                TokenType.MOD -> {
+                    val right = valuesStack.removeLast()
+                    val left = valuesStack.removeLast()
+                    valuesStack.add(left % right)
+                }
+
+                TokenType.IDIVIDE -> {
+                    val right = valuesStack.removeLast().toInt()
+                    val left = valuesStack.removeLast().toInt()
+                    valuesStack.add(left.div(right).toDouble())
+                }
+
                 else -> throw IllegalStateException("Unexpected operator: $operator")
             }
         }
@@ -71,7 +83,10 @@ object NumberInterpreter : ExpressionInterpreter<NumberExpression> {
         for (token in tokens) {
             when (token.type) {
                 TokenType.NUMBER -> valuesStack.add(token.value.toDouble())
-                TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE -> operatorsStack.add(token.type)
+                TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MOD, TokenType.IDIVIDE -> operatorsStack.add(
+                    token.type
+                )
+
                 TokenType.LPAREN -> operatorsStack.add(token.type)
                 TokenType.RPAREN -> {
                     while (operatorsStack.isNotEmpty() && operatorsStack.last() != TokenType.LPAREN) {

@@ -12,20 +12,18 @@ data class PathExpression(
     val statements: List<Statement>
 ) : Expression {
     companion object : ExpressionParser<PathExpression> {
-        fun parse(input: List<Token>, withCallStatements: Boolean): Pair<Int, PathExpression>? {
+        override fun parse(input: List<Token>): Pair<Int, PathExpression>? {
             val statements = mutableListOf<Statement>()
             var size = 0
 
             while (size < input.size) {
                 var found = false
 
-                if (withCallStatements) {
-                    val callStatement = CallStatement.parse(input.drop(size))
-                    if (callStatement != null) {
-                        statements.add(callStatement.second)
-                        size += callStatement.first
-                        found = true
-                    }
+                val callStatement = CallStatement.parse(input.drop(size))
+                if (callStatement != null) {
+                    statements.add(callStatement.second)
+                    size += callStatement.first
+                    found = true
                 }
 
                 if (!found && input[size].type == TokenType.ID) {
@@ -50,10 +48,6 @@ data class PathExpression(
             } else {
                 size to PathExpression(statements)
             }
-        }
-
-        override fun parse(input: List<Token>): Pair<Int, PathExpression>? {
-            return parse(input, true)
         }
     }
 }

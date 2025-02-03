@@ -6,7 +6,7 @@ import kotlin.test.assertContentEquals
 
 class LexerTest {
     @Test
-    fun lexVariable() {
+    fun lexVar() {
         assertContentEquals(
             listOf(
                 Token(TokenType.VAR, "var"),
@@ -31,7 +31,7 @@ class LexerTest {
     }
 
     @Test
-    fun lexFunction() {
+    fun lexFun() {
         assertContentEquals(
             listOf(
                 Token(TokenType.FUN, "fun"),
