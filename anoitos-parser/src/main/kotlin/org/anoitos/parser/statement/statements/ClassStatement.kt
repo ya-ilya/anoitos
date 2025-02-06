@@ -22,16 +22,16 @@ data class ClassStatement(
                 TokenType.RBRACE
             ) ?: return null
 
-            val bodyStatements = Parser.parse(body)
+            val bodyElements = Parser.parse(body)
 
-            if (bodyStatements.any { it !is VarStatement && it !is FunStatement }) {
+            if (bodyElements.any { it !is VarStatement && it !is FunStatement }) {
                 throw IllegalStateException("BodyStatement can contain only VarSarStatement and FunStatement")
             }
 
             return size to ClassStatement(
                 name[0],
-                bodyStatements.filterIsInstance<VarStatement>(),
-                bodyStatements.filterIsInstance<FunStatement>()
+                bodyElements.filterIsInstance<VarStatement>(),
+                bodyElements.filterIsInstance<FunStatement>()
             )
         }
     }

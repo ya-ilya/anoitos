@@ -8,10 +8,10 @@ import kotlin.test.assertEquals
 class InterpreterTest {
     private fun interpret(text: String): Pair<Context, Any?> {
         val tokens = Lexer.lex(text)
-        val statements = Parser.parse(tokens)
+        val elements = Parser.parse(tokens)
         val context = Context()
 
-        return context to Interpreter.interpret(statements, context)
+        return context to Interpreter.interpret(elements, context)
     }
 
     @Test
