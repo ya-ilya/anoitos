@@ -5,21 +5,19 @@ import org.anoitos.interpreter.expression.ExpressionInterpreter
 import org.anoitos.interpreter.extensions.interpret
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
+import org.anoitos.parser.element.TokenElement
 import org.anoitos.parser.expression.expressions.NumberExpression
-import org.anoitos.parser.statement.statements.CallStatement
-import org.anoitos.parser.statement.statements.ExpressionStatement
-import org.anoitos.parser.statement.statements.TokenStatement
 
 object NumberInterpreter : ExpressionInterpreter<NumberExpression> {
     override fun interpret(expression: NumberExpression, context: Context): Any {
         val tokens = mutableListOf<Token>()
 
-        for (statement in expression.statements) {
-            when (statement) {
-                is TokenStatement -> tokens.add(statement.token)
+        for (element in expression.elements) {
+            when (element) {
+                is TokenElement -> tokens.add(element.token)
 
-                is CallStatement, is ExpressionStatement -> {
-                    val result = (statement.interpret(context) as Number)
+                else -> {
+                    val result = (element.interpret(context) as Number)
 
                     tokens.add(
                         Token(

@@ -1,21 +1,21 @@
-package org.anoitos.parser.statement.statements
+package org.anoitos.parser.expression.expressions
 
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
 import org.anoitos.parser.element.ParserElement
+import org.anoitos.parser.expression.Expression
+import org.anoitos.parser.expression.ExpressionParser
 import org.anoitos.parser.extensions.search
-import org.anoitos.parser.statement.Statement
-import org.anoitos.parser.statement.StatementParser
 
-data class NewStatement(
+@Suppress("unused")
+data class CallExpression(
     val name: Token,
     val arguments: List<ParserElement>
-) : Statement {
-    companion object : StatementParser<NewStatement> {
-        override fun parse(input: List<Token>): Pair<Int, NewStatement>? {
-            val (size, _, name, _, arguments, _) = input.search(
-                TokenType.NEW,
+) : Expression {
+    companion object : ExpressionParser<CallExpression> {
+        override fun parse(input: List<Token>): Pair<Int, CallExpression>? {
+            val (size, name, _, arguments, _) = input.search(
                 TokenType.ID,
                 TokenType.LPAREN,
                 TokenType.SEARCH_GROUP,
@@ -51,7 +51,7 @@ data class NewStatement(
                 argumentElements.add(Parser.parseElement(argument)!!.second)
             }
 
-            return size to NewStatement(
+            return size to CallExpression(
                 name[0],
                 argumentElements
             )

@@ -2,31 +2,49 @@ package org.anoitos.parser
 
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
-import org.anoitos.parser.statement.Statement
+import org.anoitos.parser.element.EmptyElement
+import org.anoitos.parser.element.ParserElement
+import org.anoitos.parser.expression.ExpressionParser
+import org.anoitos.parser.expression.ExpressionRegistry
 import org.anoitos.parser.statement.StatementRegistry
-import org.anoitos.parser.statement.statements.EmptyStatement
 
 object Parser {
-    fun parse(input: List<Token>): List<Statement> {
+    fun parse(input: List<Token>): List<ParserElement> {
         var current = 0
-        val statements = mutableListOf<Statement>()
+        val elements = mutableListOf<ParserElement>()
 
         while (current < input.size) {
-            parseStatement(input.drop(current)).also { (size, statement) ->
+            val element = parseElement(input.drop(current))?.also { (size, element) ->
                 current += size
 
-                if (statement !is EmptyStatement) {
-                    statements.add(statement)
+                if (element !is EmptyElement) {
+                    elements.add(element)
                 }
             }
+
+            if (element != null) continue
+
+            throw IllegalStateException("No valid statement or expression found for the given input")
         }
 
-        return statements
+        return elements
     }
 
-    fun parseStatement(input: List<Token>): Pair<Int, Statement> {
+    fun parseElement(input: List<Token>): Pair<Int, ParserElement>? {
+        val statementResult = parseStatement(input)
+
+        if (statementResult != null) return statementResult
+
+        val expressionResult = parseExpression(input)
+
+        if (expressionResult != null) return expressionResult
+
+        return null
+    }
+
+    fun parseStatement(input: List<Token>): Pair<Int, ParserElement>? {
         if (input[0].type == TokenType.SEMICOLON) {
-            return 1 to EmptyStatement()
+            return 1 to EmptyElement()
         }
 
         for (statement in StatementRegistry.statements) {
@@ -37,6 +55,21 @@ object Parser {
             }
         }
 
-        throw IllegalStateException("No valid statement found for the given input")
+        return null
+    }
+
+    fun parseExpression(
+        input: List<Token>,
+        exclude: List<ExpressionParser<*>> = emptyList()
+    ): Pair<Int, ParserElement>? {
+        for (expression in ExpressionRegistry.expressions.filter { !exclude.contains(it) }) {
+            val result = expression.parse(input)
+
+            if (result != null) {
+                return result
+            }
+        }
+
+        return null
     }
 }

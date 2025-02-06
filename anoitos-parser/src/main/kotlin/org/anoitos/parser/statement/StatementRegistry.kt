@@ -17,8 +17,6 @@ object StatementRegistry {
         ContinueStatement,
         ImportStatement,
         NewStatement,
-        SetStatement,
-        ExpressionStatement,
-        CallStatement
+        SetStatement
     )
 }

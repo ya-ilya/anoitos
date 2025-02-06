@@ -3,19 +3,18 @@ package org.anoitos.parser.expression.expressions
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenGroup
 import org.anoitos.lexer.token.TokenType
+import org.anoitos.parser.Parser
+import org.anoitos.parser.element.ParserElement
+import org.anoitos.parser.element.TokenElement
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.expression.ExpressionParser
-import org.anoitos.parser.statement.Statement
-import org.anoitos.parser.statement.statements.CallStatement
-import org.anoitos.parser.statement.statements.ExpressionStatement
-import org.anoitos.parser.statement.statements.TokenStatement
 
 data class BooleanExpression(
-    val statements: List<Statement>
+    val elements: List<ParserElement>
 ) : Expression {
     companion object : ExpressionParser<BooleanExpression> {
         override fun parse(input: List<Token>): Pair<Int, BooleanExpression>? {
-            val result = mutableListOf<Statement>()
+            val result = mutableListOf<ParserElement>()
             var index = 0
 
             while (index < input.size) {
@@ -28,31 +27,24 @@ data class BooleanExpression(
 
                     TokenType.TRUE, TokenType.FALSE -> {
                         index++
-                        result.add(TokenStatement(token))
+                        result.add(TokenElement(token))
                     }
 
                     TokenType.AND, TokenType.OR, TokenType.NOT, TokenType.EQUALS -> {
                         index++
-                        result.add(TokenStatement(token))
+                        result.add(TokenElement(token))
                     }
 
                     TokenType.LPAREN -> {
                         val subExpression = parseSubExpression(input.drop(index + 1)) ?: return null
                         index += subExpression.first + 2 // +2 to account for the parentheses
-                        result.add(ExpressionStatement(subExpression.second))
+                        result.add(subExpression.second)
                     }
 
                     else -> {
                         val statementInput = input.drop(index)
-                        val callStatement = CallStatement.parse(statementInput)
 
-                        if (callStatement?.second != null) {
-                            index += callStatement.first
-                            result.add(callStatement.second)
-                            continue
-                        }
-
-                        val expressionStatement = ExpressionStatement.parse(
+                        val expression = Parser.parseExpression(
                             statementInput,
                             listOf(
                                 BooleanExpression,
@@ -61,9 +53,9 @@ data class BooleanExpression(
                             )
                         )
 
-                        if (expressionStatement?.second != null && expressionStatement.second.expression is PathExpression) {
-                            index += expressionStatement.first
-                            result.add(expressionStatement.second)
+                        if (expression?.second != null) {
+                            index += expression.first
+                            result.add(expression.second)
                             continue
                         }
 
@@ -72,7 +64,7 @@ data class BooleanExpression(
                 }
             }
 
-            return if (result.isEmpty() || result.none { (it is TokenStatement && it.token.type.group == TokenGroup.LOGICAL) || (it is ExpressionStatement && it.expression is BooleanExpression) }) {
+            return if (result.isEmpty() || result.none { (it is TokenElement && it.token.type.group == TokenGroup.LOGICAL) || (it is BooleanExpression) }) {
                 null
             } else {
                 index to BooleanExpression(result)
@@ -80,7 +72,7 @@ data class BooleanExpression(
         }
 
         private fun parseSubExpression(input: List<Token>): Pair<Int, BooleanExpression>? {
-            val result = mutableListOf<Statement>()
+            val result = mutableListOf<ParserElement>()
             var index = 0
 
             while (index < input.size) {
@@ -89,18 +81,18 @@ data class BooleanExpression(
                 when (token.type) {
                     TokenType.TRUE, TokenType.FALSE -> {
                         index++
-                        result.add(TokenStatement(token))
+                        result.add(TokenElement(token))
                     }
 
                     TokenType.AND, TokenType.OR, TokenType.NOT, TokenType.EQUALS -> {
                         index++
-                        result.add(TokenStatement(token))
+                        result.add(TokenElement(token))
                     }
 
                     TokenType.LPAREN -> {
                         val subExpression = parseSubExpression(input.drop(index + 1)) ?: return null
                         index += subExpression.first + 2 // +2 to account for the parentheses
-                        result.add(ExpressionStatement(subExpression.second))
+                        result.add(subExpression.second)
                     }
 
                     TokenType.RPAREN -> {
@@ -109,15 +101,8 @@ data class BooleanExpression(
 
                     else -> {
                         val statementInput = input.drop(index)
-                        val callStatement = CallStatement.parse(statementInput)
 
-                        if (callStatement?.second != null) {
-                            index += callStatement.first
-                            result.add(callStatement.second)
-                            continue
-                        }
-
-                        val expressionStatement = ExpressionStatement.parse(
+                        val expression = Parser.parseExpression(
                             statementInput,
                             listOf(
                                 BooleanExpression,
@@ -126,9 +111,9 @@ data class BooleanExpression(
                             )
                         )
 
-                        if (expressionStatement?.second != null && expressionStatement.second.expression is PathExpression) {
-                            index += expressionStatement.first
-                            result.add(expressionStatement.second)
+                        if (expression?.second != null) {
+                            index += expression.first
+                            result.add(expression.second)
                             continue
                         }
 

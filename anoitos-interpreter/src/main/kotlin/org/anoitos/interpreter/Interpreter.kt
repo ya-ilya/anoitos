@@ -5,23 +5,36 @@ import org.anoitos.interpreter.expression.ExpressionInterpreterRegistry
 import org.anoitos.interpreter.extensions.interpret
 import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.interpreter.statement.StatementInterpreterRegistry
+import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.statement.Statement
 import org.anoitos.parser.statement.statements.BreakStatement
 import org.anoitos.parser.statement.statements.ContinueStatement
 
 object Interpreter {
-    fun interpret(statements: List<Statement>, context: Context): Any? {
-        for (statement in statements) {
-            when (statement) {
-                is BreakStatement -> return InterpretResult.Break
-                is ContinueStatement -> return InterpretResult.Continue
-            }
+    fun interpret(elements: List<ParserElement>, context: Context): Any? {
+        for (element in elements) {
+            when (element) {
+                is Statement -> {
+                    when (element) {
+                        is BreakStatement -> return InterpretResult.Break
+                        is ContinueStatement -> return InterpretResult.Continue
+                    }
 
-            val result = statement.interpret(context)
+                    val result = element.interpret(context)
 
-            if (result is InterpretResult.Return) {
-                return result
+                    if (result is InterpretResult.Return) {
+                        return result
+                    }
+                }
+
+                is Expression -> {
+                    val result = element.interpret(context)
+
+                    if (result is InterpretResult.Return) {
+                        return result
+                    }
+                }
             }
         }
 

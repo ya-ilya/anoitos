@@ -3,15 +3,16 @@ package org.anoitos.parser.statement.statements
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.extensions.SearchResult
 import org.anoitos.parser.extensions.search
 import org.anoitos.parser.statement.Statement
 import org.anoitos.parser.statement.StatementParser
 
 data class IfStatement(
-    val ifCondition: Statement,
+    val ifCondition: ParserElement,
     val ifBlock: BlockStatement,
-    val elIfs: Map<Statement, BlockStatement>,
+    val elIfs: Map<ParserElement, BlockStatement>,
     val elseBlock: BlockStatement?
 ) : Statement {
     companion object : StatementParser<IfStatement> {
@@ -26,7 +27,7 @@ data class IfStatement(
                 TokenType.RBRACE
             ) ?: return null
 
-            val elIfs = mutableMapOf<Statement, BlockStatement>()
+            val elIfs = mutableMapOf<ParserElement, BlockStatement>()
             while (true) {
                 val (elIfSize, _, _, elIfCondition, _, _, elIfBody, _) = input.drop(size).search(
                     TokenType.ELIF,
@@ -39,7 +40,7 @@ data class IfStatement(
                 ) ?: break
 
                 size += elIfSize
-                elIfs[Parser.parseStatement(elIfCondition).second] = BlockStatement.parse(elIfBody).second
+                elIfs[Parser.parseElement(elIfCondition)!!.second] = BlockStatement.parse(elIfBody).second
             }
 
             val (elseSize, _, _, elseBody, _) = input.drop(size).search(
@@ -52,14 +53,14 @@ data class IfStatement(
             return if (elseSize != 0) {
                 size += elseSize
                 size to IfStatement(
-                    Parser.parseStatement(condition).second,
+                    Parser.parseElement(condition)!!.second,
                     BlockStatement.parse(body).second,
                     elIfs,
                     BlockStatement.parse(elseBody).second
                 )
             } else {
                 size to IfStatement(
-                    Parser.parseStatement(condition).second,
+                    Parser.parseElement(condition)!!.second,
                     BlockStatement.parse(body).second,
                     elIfs,
                     null

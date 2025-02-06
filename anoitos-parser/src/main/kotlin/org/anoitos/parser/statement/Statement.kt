@@ -1,3 +1,5 @@
 package org.anoitos.parser.statement
 
-interface Statement
+import org.anoitos.parser.element.ParserElement
+
+interface Statement : ParserElement

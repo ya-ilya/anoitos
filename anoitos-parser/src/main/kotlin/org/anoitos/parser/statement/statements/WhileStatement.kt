@@ -3,12 +3,13 @@ package org.anoitos.parser.statement.statements
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.extensions.search
 import org.anoitos.parser.statement.Statement
 import org.anoitos.parser.statement.StatementParser
 
 data class WhileStatement(
-    val condition: Statement,
+    val condition: ParserElement,
     val body: BlockStatement
 ) : Statement {
     companion object : StatementParser<WhileStatement> {
@@ -24,7 +25,7 @@ data class WhileStatement(
             ) ?: return null
 
             return size to WhileStatement(
-                Parser.parseStatement(condition).second,
+                Parser.parseElement(condition)!!.second,
                 BlockStatement.parse(body).second
             )
         }

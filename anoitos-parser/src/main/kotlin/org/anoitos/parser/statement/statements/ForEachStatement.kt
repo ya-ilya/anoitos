@@ -3,13 +3,14 @@ package org.anoitos.parser.statement.statements
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.extensions.search
 import org.anoitos.parser.statement.Statement
 import org.anoitos.parser.statement.StatementParser
 
 data class ForEachStatement(
     val identifier: Token,
-    val value: Statement,
+    val value: ParserElement,
     val body: BlockStatement
 ) : Statement {
     companion object : StatementParser<ForEachStatement> {
@@ -28,7 +29,7 @@ data class ForEachStatement(
 
             return size to ForEachStatement(
                 identifier[0],
-                Parser.parseStatement(value).second,
+                Parser.parseElement(value)!!.second,
                 BlockStatement.parse(body).second
             )
         }

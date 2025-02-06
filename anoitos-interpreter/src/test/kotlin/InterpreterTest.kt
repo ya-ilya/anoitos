@@ -45,4 +45,28 @@ class InterpreterTest {
             context.getVariable("result")
         )
     }
+
+    @Test
+    fun interpretFibonacci() {
+        val (context, _) = interpret("""
+            import 'logic';
+
+            fun fibonacci(n) {
+                if (equals(n, 0)) {
+                    return 0;
+                } elif (equals(n, 1)) {
+                    return 1;
+                } else {
+                    return fibonacci(n - 1) + fibonacci(n - 2);
+                }
+            }
+            
+            var result = fibonacci(10);
+        """.trimIndent())
+
+        assertEquals(
+            55.0,
+            context.getVariable("result")
+        )
+    }
 }

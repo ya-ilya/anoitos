@@ -2,7 +2,9 @@ import org.anoitos.lexer.Lexer
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.element.TokenElement
 import org.anoitos.parser.expression.expressions.BooleanExpression
+import org.anoitos.parser.expression.expressions.CallExpression
 import org.anoitos.parser.expression.expressions.NumberExpression
 import org.anoitos.parser.expression.expressions.PathExpression
 import org.anoitos.parser.statement.statements.*
@@ -19,27 +21,6 @@ class ParserTest {
     }
 
     @Test
-    fun parseCall() {
-        assertEquals(
-            CallStatement(
-                Token(TokenType.ID, "myFunction"),
-                listOf(
-                    ExpressionStatement(
-                        PathExpression(
-                            listOf(
-                                TokenStatement(
-                                    Token(TokenType.ID, "param")
-                                )
-                            )
-                        )
-                    )
-                )
-            ),
-            Parser.parse(Lexer.lex("myFunction(param)"))[0]
-        )
-    }
-
-    @Test
     fun parseClass() {
         assertEquals(
             ClassStatement(
@@ -47,12 +28,10 @@ class ParserTest {
                 listOf(
                     VarStatement(
                         Token(TokenType.ID, "variable"),
-                        ExpressionStatement(
-                            NumberExpression(
-                                listOf(
-                                    TokenStatement(
-                                        Token(TokenType.NUMBER, "10")
-                                    )
+                        NumberExpression(
+                            listOf(
+                                TokenElement(
+                                    Token(TokenType.NUMBER, "10")
                                 )
                             )
                         )
@@ -65,12 +44,10 @@ class ParserTest {
                         BlockStatement(
                             listOf(
                                 ReturnStatement(
-                                    ExpressionStatement(
-                                        NumberExpression(
-                                            listOf(
-                                                TokenStatement(
-                                                    Token(TokenType.NUMBER, "42")
-                                                )
+                                    NumberExpression(
+                                        listOf(
+                                            TokenElement(
+                                                Token(TokenType.NUMBER, "42")
                                             )
                                         )
                                     )
@@ -96,11 +73,9 @@ class ParserTest {
     fun parseDo() {
         assertEquals(
             DoStatement(
-                ExpressionStatement(
-                    BooleanExpression(
-                        listOf(
-                            TokenStatement(Token(TokenType.TRUE, "true"))
-                        )
+                BooleanExpression(
+                    listOf(
+                        TokenElement(Token(TokenType.TRUE, "true"))
                     )
                 ),
                 BlockStatement(
@@ -118,12 +93,10 @@ class ParserTest {
         assertEquals(
             ForEachStatement(
                 Token(TokenType.ID, "item"),
-                ExpressionStatement(
-                    PathExpression(
-                        listOf(
-                            TokenStatement(
-                                Token(TokenType.ID, "items")
-                            )
+                PathExpression(
+                    listOf(
+                        TokenElement(
+                            Token(TokenType.ID, "items")
                         )
                     )
                 ),
@@ -144,24 +117,22 @@ class ParserTest {
                 Token(TokenType.ID, "index"),
                 NumberExpression(
                     listOf(
-                        TokenStatement(Token(TokenType.NUMBER, "0"))
+                        TokenElement(Token(TokenType.NUMBER, "0"))
                     )
                 ),
                 NumberExpression(
                     listOf(
-                        TokenStatement(Token(TokenType.NUMBER, "10"))
+                        TokenElement(Token(TokenType.NUMBER, "10"))
                     )
                 ),
                 BlockStatement(
                     listOf(
-                        CallStatement(
+                        CallExpression(
                             Token(TokenType.ID, "println"),
                             listOf(
-                                ExpressionStatement(
-                                    PathExpression(
-                                        listOf(
-                                            TokenStatement(Token(TokenType.ID, "index"))
-                                        )
+                                PathExpression(
+                                    listOf(
+                                        TokenElement(Token(TokenType.ID, "index"))
                                     )
                                 )
                             )
@@ -182,12 +153,10 @@ class ParserTest {
                 BlockStatement(
                     listOf(
                         ReturnStatement(
-                            ExpressionStatement(
-                                NumberExpression(
-                                    listOf(
-                                        TokenStatement(
-                                            Token(TokenType.NUMBER, "42")
-                                        )
+                            NumberExpression(
+                                listOf(
+                                    TokenElement(
+                                        Token(TokenType.NUMBER, "42")
                                     )
                                 )
                             )
@@ -203,11 +172,9 @@ class ParserTest {
     fun parseIf() {
         assertEquals(
             IfStatement(
-                ExpressionStatement(
-                    BooleanExpression(
-                        listOf(
-                            TokenStatement(Token(TokenType.TRUE, "true"))
-                        )
+                BooleanExpression(
+                    listOf(
+                        TokenElement(Token(TokenType.TRUE, "true"))
                     )
                 ),
                 BlockStatement(
@@ -247,15 +214,13 @@ class ParserTest {
             SetStatement(
                 PathExpression(
                     listOf(
-                        TokenStatement(Token(TokenType.ID, "variable"))
+                        TokenElement(Token(TokenType.ID, "variable"))
                     )
                 ),
-                ExpressionStatement(
-                    NumberExpression(
-                        listOf(
-                            TokenStatement(
-                                Token(TokenType.NUMBER, "42")
-                            )
+                NumberExpression(
+                    listOf(
+                        TokenElement(
+                            Token(TokenType.NUMBER, "42")
                         )
                     )
                 )
@@ -269,12 +234,10 @@ class ParserTest {
         assertEquals(
             VarStatement(
                 Token(TokenType.ID, "variable"),
-                ExpressionStatement(
-                    NumberExpression(
-                        listOf(
-                            TokenStatement(
-                                Token(TokenType.NUMBER, "10")
-                            )
+                NumberExpression(
+                    listOf(
+                        TokenElement(
+                            Token(TokenType.NUMBER, "10")
                         )
                     )
                 )
@@ -287,11 +250,9 @@ class ParserTest {
     fun parseWhile() {
         assertEquals(
             WhileStatement(
-                ExpressionStatement(
-                    BooleanExpression(
-                        listOf(
-                            TokenStatement(Token(TokenType.TRUE, "true"))
-                        )
+                BooleanExpression(
+                    listOf(
+                        TokenElement(Token(TokenType.TRUE, "true"))
                     )
                 ),
                 BlockStatement(

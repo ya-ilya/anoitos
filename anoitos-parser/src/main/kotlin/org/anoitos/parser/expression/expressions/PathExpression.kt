@@ -2,32 +2,31 @@ package org.anoitos.parser.expression.expressions
 
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
+import org.anoitos.parser.element.ParserElement
+import org.anoitos.parser.element.TokenElement
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.expression.ExpressionParser
-import org.anoitos.parser.statement.Statement
-import org.anoitos.parser.statement.statements.CallStatement
-import org.anoitos.parser.statement.statements.TokenStatement
 
 data class PathExpression(
-    val statements: List<Statement>
+    val elements: List<ParserElement>
 ) : Expression {
     companion object : ExpressionParser<PathExpression> {
         override fun parse(input: List<Token>): Pair<Int, PathExpression>? {
-            val statements = mutableListOf<Statement>()
+            val expressions = mutableListOf<ParserElement>()
             var size = 0
 
             while (size < input.size) {
                 var found = false
 
-                val callStatement = CallStatement.parse(input.drop(size))
-                if (callStatement != null) {
-                    statements.add(callStatement.second)
-                    size += callStatement.first
+                val callExpression = CallExpression.parse(input.drop(size))
+                if (callExpression != null) {
+                    expressions.add(callExpression.second)
+                    size += callExpression.first
                     found = true
                 }
 
                 if (!found && input[size].type == TokenType.ID) {
-                    statements.add(TokenStatement(input[size]))
+                    expressions.add(TokenElement(input[size]))
                     size++
                     found = true
                 }
@@ -43,10 +42,10 @@ data class PathExpression(
                 }
             }
 
-            return if (!statements.any { it is TokenStatement }) {
+            return if (!expressions.any { it is TokenElement }) {
                 null
             } else {
-                size to PathExpression(statements)
+                size to PathExpression(expressions)
             }
         }
     }

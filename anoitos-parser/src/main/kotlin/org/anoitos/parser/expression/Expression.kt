@@ -1,3 +1,5 @@
 package org.anoitos.parser.expression
 
-interface Expression
+import org.anoitos.parser.element.ParserElement
+
+interface Expression : ParserElement
