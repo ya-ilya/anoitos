@@ -3,6 +3,7 @@ package org.anoitos.parser.statement.statements
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.ParserResult
 import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.extensions.SearchResult
 import org.anoitos.parser.extensions.search
@@ -16,7 +17,7 @@ data class IfStatement(
     val elseBlock: BlockStatement?
 ) : Statement {
     companion object : StatementParser<IfStatement> {
-        override fun parse(input: List<Token>): Pair<Int, IfStatement>? {
+        override fun parse(input: List<Token>): ParserResult<IfStatement>? {
             var (size, _, _, condition, _, _, body, _) = input.search(
                 TokenType.IF,
                 TokenType.LPAREN,
@@ -40,7 +41,7 @@ data class IfStatement(
                 ) ?: break
 
                 size += elIfSize
-                elIfs[Parser.parseElement(elIfCondition)!!.second] = BlockStatement.parse(elIfBody).second
+                elIfs[Parser.parseElement(elIfCondition)!!.element] = BlockStatement.parse(elIfBody).element
             }
 
             val (elseSize, _, _, elseBody, _) = input.drop(size).search(
@@ -52,18 +53,24 @@ data class IfStatement(
 
             return if (elseSize != 0) {
                 size += elseSize
-                size to IfStatement(
-                    Parser.parseElement(condition)!!.second,
-                    BlockStatement.parse(body).second,
-                    elIfs,
-                    BlockStatement.parse(elseBody).second
+                ParserResult(
+                    size,
+                    IfStatement(
+                        Parser.parseElement(condition)!!.element,
+                        BlockStatement.parse(body).element,
+                        elIfs,
+                        BlockStatement.parse(elseBody).element
+                    )
                 )
             } else {
-                size to IfStatement(
-                    Parser.parseElement(condition)!!.second,
-                    BlockStatement.parse(body).second,
-                    elIfs,
-                    null
+                ParserResult(
+                    size,
+                    IfStatement(
+                        Parser.parseElement(condition)!!.element,
+                        BlockStatement.parse(body).element,
+                        elIfs,
+                        null
+                    )
                 )
             }
         }

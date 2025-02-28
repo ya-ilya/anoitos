@@ -3,6 +3,7 @@ package org.anoitos.parser.statement.statements
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.ParserResult
 import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.extensions.search
 import org.anoitos.parser.statement.Statement
@@ -10,7 +11,7 @@ import org.anoitos.parser.statement.StatementParser
 
 data class DoStatement(val condition: ParserElement, val body: BlockStatement) : Statement {
     companion object : StatementParser<DoStatement> {
-        override fun parse(input: List<Token>): Pair<Int, DoStatement>? {
+        override fun parse(input: List<Token>): ParserResult<DoStatement>? {
             val (size, _, _, body, _, _, _, condition, _) = input.search(
                 TokenType.DO,
                 TokenType.LBRACE,
@@ -22,9 +23,12 @@ data class DoStatement(val condition: ParserElement, val body: BlockStatement) :
                 TokenType.RPAREN,
             ) ?: return null
 
-            return size to DoStatement(
-                Parser.parseElement(condition)!!.second,
-                BlockStatement.parse(body).second
+            return ParserResult(
+                size,
+                DoStatement(
+                    Parser.parseElement(condition)!!.element,
+                    BlockStatement.parse(body).element
+                )
             )
         }
     }

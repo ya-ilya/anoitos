@@ -2,7 +2,7 @@ package org.anoitos.interpreter.expression.interpreters
 
 import org.anoitos.interpreter.context.Context
 import org.anoitos.interpreter.expression.ExpressionInterpreter
-import org.anoitos.parser.element.TokenElement
+import org.anoitos.parser.element.elements.TokenElement
 import org.anoitos.parser.expression.expressions.CallExpression
 import org.anoitos.parser.expression.expressions.PathExpression
 

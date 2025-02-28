@@ -2,7 +2,7 @@ import org.anoitos.lexer.Lexer
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
-import org.anoitos.parser.element.TokenElement
+import org.anoitos.parser.element.elements.TokenElement
 import org.anoitos.parser.expression.expressions.BooleanExpression
 import org.anoitos.parser.expression.expressions.CallExpression
 import org.anoitos.parser.expression.expressions.NumberExpression

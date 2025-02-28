@@ -5,7 +5,7 @@ import org.anoitos.interpreter.expression.ExpressionInterpreter
 import org.anoitos.interpreter.extensions.interpret
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
-import org.anoitos.parser.element.TokenElement
+import org.anoitos.parser.element.elements.TokenElement
 import org.anoitos.parser.expression.expressions.NumberExpression
 
 object NumberInterpreter : ExpressionInterpreter<NumberExpression> {

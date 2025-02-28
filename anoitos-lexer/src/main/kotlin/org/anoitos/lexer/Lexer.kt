@@ -4,18 +4,19 @@ import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 
 object Lexer {
+    private val quotes = listOf('\'', '"')
+
     fun lex(input: String): List<Token> {
         var current = 0
         val tokens = mutableListOf<Token>()
 
         while (current < input.length) {
-            lexToken(current, input).also { (newCurrent, token) ->
-                current = newCurrent
-
-                when (token.type) {
-                    TokenType.EMPTY -> {}
-
-                    else -> tokens.add(token)
+            lexToken(current, input).also { result ->
+                if (result == null) {
+                    current += 1
+                } else {
+                    current += result.size
+                    tokens.add(result.token)
                 }
             }
         }
@@ -23,73 +24,88 @@ object Lexer {
         return tokens
     }
 
-    private fun lexToken(current: Int, input: String): Pair<Int, Token> {
+    private fun lexToken(current: Int, input: String): LexerResult? {
         if (input[current].isWhitespace()) {
-            return (current + 1 to Token(TokenType.EMPTY, " "))
+            return null
         }
 
         for (keyword in TokenType.keywords) {
             val substring = input.substring(current, input.length)
             if (substring.startsWith("${keyword.value} ") || substring.startsWith("${keyword.value};")) {
-                return (current + keyword.value.length to Token(keyword, keyword.value))
+                return LexerResult(
+                    keyword.value.length,
+                    Token(keyword, keyword.value)
+                )
             }
         }
 
         for (other in TokenType.logicals + TokenType.numerics + TokenType.other) {
             val substring = input.substring(current, input.length)
             if (substring.startsWith(other.value)) {
-                return (current + other.value.length to Token(other, other.value))
+                return LexerResult(
+                    other.value.length,
+                    Token(other, other.value)
+                )
             }
         }
 
-        if (input[current] == '"' || input[current] == '\'') {
-            var string = ""
+        if (quotes.contains(input[current])) {
+            val builder = StringBuilder()
 
             for (char in input.drop(current + 1)) {
-                if (char == '"' || char == '\'') {
+                if (quotes.contains(char)) {
                     break
-                } else {
-                    string += char
                 }
+
+                builder.append(char)
             }
 
-            return (current + string.length + 2 to Token(TokenType.STRING, string))
+            return LexerResult(
+                builder.length + 2,
+                Token(TokenType.STRING, builder.toString())
+            )
         }
 
         if (input[current].isDigit()) {
-            var number = ""
+            val builder = StringBuilder()
 
             for ((index, char) in input.drop(current).withIndex()) {
-                number += if (char.isDigit()) {
-                    char
-                } else if (char == '.' && input.elementAtOrNull(current + index + 1)?.isDigit() == true) {
-                    if (number.contains('.')) {
-                        break
-                    }
+                builder.append(
+                    when {
+                        char.isDigit() -> char
+                        char == TokenType.DOT.value[0] && input.elementAtOrNull(current + index + 1)?.isDigit() == true -> {
+                            if (builder.contains(TokenType.DOT.value[0])) {
+                                break
+                            }
 
-                    char
-                } else {
-                    break
-                }
+                            char
+                        }
+                        else -> break
+                    }
+                )
             }
 
-            return (current + number.length to Token(TokenType.NUMBER, number))
+            return LexerResult(
+                builder.length,
+                Token(TokenType.NUMBER, builder.toString())
+            )
         }
 
-        val inputFromCurrent = input.drop(current)
-
         if (input[current].isLetter()) {
-            var identifier = ""
+            val builder = StringBuilder()
 
-            for (char in inputFromCurrent) {
+            for (char in input.drop(current)) {
                 if (char.isLetterOrDigit()) {
-                    identifier += char
+                    builder.append(char)
                 } else {
                     break
                 }
             }
 
-            return (current + identifier.length to Token(TokenType.ID, identifier))
+            return LexerResult(
+                builder.length,
+                Token(TokenType.ID, builder.toString())
+            )
         }
 
         throw IllegalStateException("Unknown token ${input[current]} at position $current in $input")

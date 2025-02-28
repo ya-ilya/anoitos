@@ -3,7 +3,6 @@ package org.anoitos.interpreter
 import org.anoitos.interpreter.context.Context
 import org.anoitos.interpreter.expression.ExpressionInterpreterRegistry
 import org.anoitos.interpreter.extensions.interpret
-import org.anoitos.interpreter.result.InterpretResult
 import org.anoitos.interpreter.statement.StatementInterpreterRegistry
 import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.expression.Expression

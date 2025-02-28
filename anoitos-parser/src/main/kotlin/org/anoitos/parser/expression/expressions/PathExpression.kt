@@ -2,8 +2,9 @@ package org.anoitos.parser.expression.expressions
 
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
+import org.anoitos.parser.ParserResult
 import org.anoitos.parser.element.ParserElement
-import org.anoitos.parser.element.TokenElement
+import org.anoitos.parser.element.elements.TokenElement
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.expression.ExpressionParser
 
@@ -11,7 +12,7 @@ data class PathExpression(
     val elements: List<ParserElement>
 ) : Expression {
     companion object : ExpressionParser<PathExpression> {
-        override fun parse(input: List<Token>): Pair<Int, PathExpression>? {
+        override fun parse(input: List<Token>): ParserResult<PathExpression>? {
             val expressions = mutableListOf<ParserElement>()
             var size = 0
 
@@ -20,8 +21,8 @@ data class PathExpression(
 
                 val callExpression = CallExpression.parse(input.drop(size))
                 if (callExpression != null) {
-                    expressions.add(callExpression.second)
-                    size += callExpression.first
+                    size += callExpression.size
+                    expressions.add(callExpression.element)
                     found = true
                 }
 
@@ -45,7 +46,10 @@ data class PathExpression(
             return if (!expressions.any { it is TokenElement }) {
                 null
             } else {
-                size to PathExpression(expressions)
+                ParserResult(
+                    size,
+                    PathExpression(expressions)
+                )
             }
         }
     }

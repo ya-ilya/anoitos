@@ -3,6 +3,7 @@ package org.anoitos.parser.statement.statements
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.ParserResult
 import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.extensions.search
 import org.anoitos.parser.statement.Statement
@@ -13,7 +14,7 @@ data class NewStatement(
     val arguments: List<ParserElement>
 ) : Statement {
     companion object : StatementParser<NewStatement> {
-        override fun parse(input: List<Token>): Pair<Int, NewStatement>? {
+        override fun parse(input: List<Token>): ParserResult<NewStatement>? {
             val (size, _, name, _, arguments, _) = input.search(
                 TokenType.NEW,
                 TokenType.ID,
@@ -40,7 +41,7 @@ data class NewStatement(
                 }
 
                 if (token.type == TokenType.COMMA && parens == 0 && brackets == 0 && braces == 0) {
-                    argumentElements.add(Parser.parseElement(argument)!!.second)
+                    argumentElements.add(Parser.parseElement(argument)!!.element)
                     argument.clear()
                 } else {
                     argument.add(token)
@@ -48,12 +49,15 @@ data class NewStatement(
             }
 
             if (argument.isNotEmpty()) {
-                argumentElements.add(Parser.parseElement(argument)!!.second)
+                argumentElements.add(Parser.parseElement(argument)!!.element)
             }
 
-            return size to NewStatement(
-                name[0],
-                argumentElements
+            return ParserResult(
+                size,
+                NewStatement(
+                    name[0],
+                    argumentElements
+                )
             )
         }
     }

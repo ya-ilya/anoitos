@@ -1,6 +1,7 @@
-package org.anoitos.parser.element
+package org.anoitos.parser.element.elements
 
 import org.anoitos.lexer.token.Token
+import org.anoitos.parser.element.ParserElement
 
 class TokenElement(val token: Token) : ParserElement {
     override fun equals(other: Any?): Boolean {

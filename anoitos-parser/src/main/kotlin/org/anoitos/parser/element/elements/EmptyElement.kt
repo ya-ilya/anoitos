@@ -1,6 +1,8 @@
-package org.anoitos.parser.element
+package org.anoitos.parser.element.elements
 
-class EmptyElement : ParserElement {
+import org.anoitos.parser.element.ParserElement
+
+object EmptyElement : ParserElement {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

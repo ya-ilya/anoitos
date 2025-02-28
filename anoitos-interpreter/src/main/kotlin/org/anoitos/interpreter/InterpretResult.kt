@@ -1,4 +1,4 @@
-package org.anoitos.interpreter.result
+package org.anoitos.interpreter
 
 sealed interface InterpretResult {
     data object Break : InterpretResult

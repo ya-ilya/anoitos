@@ -3,6 +3,7 @@ package org.anoitos.parser.expression.expressions
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.ParserResult
 import org.anoitos.parser.element.ParserElement
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.expression.ExpressionParser
@@ -14,7 +15,7 @@ data class CallExpression(
     val arguments: List<ParserElement>
 ) : Expression {
     companion object : ExpressionParser<CallExpression> {
-        override fun parse(input: List<Token>): Pair<Int, CallExpression>? {
+        override fun parse(input: List<Token>): ParserResult<CallExpression>? {
             val (size, name, _, arguments, _) = input.search(
                 TokenType.ID,
                 TokenType.LPAREN,
@@ -40,7 +41,7 @@ data class CallExpression(
                 }
 
                 if (token.type == TokenType.COMMA && parens == 0 && brackets == 0 && braces == 0) {
-                    argumentElements.add(Parser.parseElement(argument)!!.second)
+                    argumentElements.add(Parser.parseElement(argument)!!.element)
                     argument.clear()
                 } else {
                     argument.add(token)
@@ -48,12 +49,15 @@ data class CallExpression(
             }
 
             if (argument.isNotEmpty()) {
-                argumentElements.add(Parser.parseElement(argument)!!.second)
+                argumentElements.add(Parser.parseElement(argument)!!.element)
             }
 
-            return size to CallExpression(
-                name[0],
-                argumentElements
+            return ParserResult(
+                size,
+                CallExpression(
+                    name[0],
+                    argumentElements
+                )
             )
         }
     }

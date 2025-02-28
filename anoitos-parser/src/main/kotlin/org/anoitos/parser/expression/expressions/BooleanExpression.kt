@@ -4,8 +4,9 @@ import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenGroup
 import org.anoitos.lexer.token.TokenType
 import org.anoitos.parser.Parser
+import org.anoitos.parser.ParserResult
 import org.anoitos.parser.element.ParserElement
-import org.anoitos.parser.element.TokenElement
+import org.anoitos.parser.element.elements.TokenElement
 import org.anoitos.parser.expression.Expression
 import org.anoitos.parser.expression.ExpressionParser
 
@@ -13,7 +14,7 @@ data class BooleanExpression(
     val elements: List<ParserElement>
 ) : Expression {
     companion object : ExpressionParser<BooleanExpression> {
-        override fun parse(input: List<Token>): Pair<Int, BooleanExpression>? {
+        override fun parse(input: List<Token>): ParserResult<BooleanExpression>? {
             val result = mutableListOf<ParserElement>()
             var index = 0
 
@@ -53,9 +54,9 @@ data class BooleanExpression(
                             )
                         )
 
-                        if (expression?.second != null) {
-                            index += expression.first
-                            result.add(expression.second)
+                        if (expression?.element != null) {
+                            index += expression.size
+                            result.add(expression.element)
                             continue
                         }
 
@@ -67,7 +68,7 @@ data class BooleanExpression(
             return if (result.isEmpty() || result.none { (it is TokenElement && it.token.type.group == TokenGroup.LOGICAL) || (it is BooleanExpression) }) {
                 null
             } else {
-                index to BooleanExpression(result)
+                ParserResult(index, BooleanExpression(result))
             }
         }
 
@@ -111,9 +112,9 @@ data class BooleanExpression(
                             )
                         )
 
-                        if (expression?.second != null) {
-                            index += expression.first
-                            result.add(expression.second)
+                        if (expression?.element != null) {
+                            index += expression.size
+                            result.add(expression.element)
                             continue
                         }
 

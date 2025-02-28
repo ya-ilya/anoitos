@@ -2,8 +2,8 @@ package org.anoitos.parser
 
 import org.anoitos.lexer.token.Token
 import org.anoitos.lexer.token.TokenType
-import org.anoitos.parser.element.EmptyElement
 import org.anoitos.parser.element.ParserElement
+import org.anoitos.parser.element.elements.EmptyElement
 import org.anoitos.parser.expression.ExpressionParser
 import org.anoitos.parser.expression.ExpressionRegistry
 import org.anoitos.parser.statement.StatementRegistry
@@ -14,11 +14,11 @@ object Parser {
         val elements = mutableListOf<ParserElement>()
 
         while (current < input.size) {
-            val element = parseElement(input.drop(current))?.also { (size, element) ->
-                current += size
+            val element = parseElement(input.drop(current))?.also { result ->
+                current += result.size
 
-                if (element !is EmptyElement) {
-                    elements.add(element)
+                if (result.element !is EmptyElement) {
+                    elements.add(result.element)
                 }
             }
 
@@ -30,7 +30,7 @@ object Parser {
         return elements
     }
 
-    fun parseElement(input: List<Token>): Pair<Int, ParserElement>? {
+    fun parseElement(input: List<Token>): ParserResult<ParserElement>? {
         val statementResult = parseStatement(input)
 
         if (statementResult != null) return statementResult
@@ -42,9 +42,12 @@ object Parser {
         return null
     }
 
-    fun parseStatement(input: List<Token>): Pair<Int, ParserElement>? {
+    fun parseStatement(input: List<Token>): ParserResult<ParserElement>? {
         if (input[0].type == TokenType.SEMICOLON) {
-            return 1 to EmptyElement()
+            return ParserResult(
+                1,
+                EmptyElement
+            )
         }
 
         for (statement in StatementRegistry.statements) {
@@ -61,7 +64,7 @@ object Parser {
     fun parseExpression(
         input: List<Token>,
         exclude: List<ExpressionParser<*>> = emptyList()
-    ): Pair<Int, ParserElement>? {
+    ): ParserResult<ParserElement>? {
         for (expression in ExpressionRegistry.expressions.filter { !exclude.contains(it) }) {
             val result = expression.parse(input)
 
