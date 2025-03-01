@@ -9,6 +9,13 @@ import org.anoitos.parser.element.elements.TokenElement
 import org.anoitos.parser.expression.expressions.BooleanExpression
 
 object BooleanInterpreter : ExpressionInterpreter<BooleanExpression> {
+    private val precedences = mapOf(
+        TokenType.NOT to 3,
+        TokenType.AND to 2,
+        TokenType.OR to 1,
+        TokenType.EQUALS to 0
+    )
+
     override fun interpret(expression: BooleanExpression, context: Context): Any {
         val tokens = mutableListOf<Token>()
 
@@ -17,7 +24,11 @@ object BooleanInterpreter : ExpressionInterpreter<BooleanExpression> {
                 is TokenElement -> tokens.add(element.token)
 
                 else -> {
-                    val result = (element.interpret(context) as Boolean)
+                    val result = element.interpret(context)
+
+                    if (result !is Boolean) {
+                        throw IllegalStateException("Result should be a boolean value")
+                    }
 
                     tokens.add(
                         Token(
@@ -69,7 +80,6 @@ object BooleanInterpreter : ExpressionInterpreter<BooleanExpression> {
             when (token.type) {
                 TokenType.TRUE -> valuesStack.add(true)
                 TokenType.FALSE -> valuesStack.add(false)
-                TokenType.NOT, TokenType.AND, TokenType.OR, TokenType.EQUALS -> operatorsStack.add(token.type)
                 TokenType.LPAREN -> operatorsStack.add(token.type)
                 TokenType.RPAREN -> {
                     while (operatorsStack.isNotEmpty() && operatorsStack.last() != TokenType.LPAREN) {
@@ -78,6 +88,17 @@ object BooleanInterpreter : ExpressionInterpreter<BooleanExpression> {
                     if (operatorsStack.isEmpty() || operatorsStack.removeLast() != TokenType.LPAREN) {
                         throw IllegalStateException("Mismatched parentheses")
                     }
+                }
+
+                TokenType.NOT, TokenType.AND, TokenType.OR, TokenType.EQUALS -> {
+                    while (
+                        operatorsStack.isNotEmpty() &&
+                        operatorsStack.last() != TokenType.LPAREN &&
+                        precedences[operatorsStack.last()]!! >= precedences[token.type]!!
+                    ) {
+                        applyOperator()
+                    }
+                    operatorsStack.add(token.type)
                 }
 
                 else -> throw IllegalStateException("Unexpected token: ${token.type}")

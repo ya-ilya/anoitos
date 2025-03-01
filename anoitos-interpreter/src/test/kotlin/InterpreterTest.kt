@@ -69,4 +69,26 @@ class InterpreterTest {
             context.getVariable("result")?.value
         )
     }
+
+    @Test
+    fun interpretDecimalToBinary() {
+        val (context, _) = interpret("""
+            import 'logic';
+            
+            fun decimalToBinary(n) {
+                if (equals(n, 0)) {
+                    return n;
+                } else {
+                    return (n % 2 + 10 * decimalToBinary(n // 2));
+                }
+            }
+            
+            var result = decimalToBinary(10);
+        """.trimIndent())
+
+        assertEquals(
+            1010.0,
+            context.getVariable("result")?.value
+        )
+    }
 }

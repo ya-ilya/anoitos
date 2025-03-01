@@ -9,6 +9,15 @@ import org.anoitos.parser.element.elements.TokenElement
 import org.anoitos.parser.expression.expressions.NumberExpression
 
 object NumberInterpreter : ExpressionInterpreter<NumberExpression> {
+    private val precedences = mapOf(
+        TokenType.PLUS to 1,
+        TokenType.MINUS to 1,
+        TokenType.MULTIPLY to 2,
+        TokenType.DIVIDE to 2,
+        TokenType.MOD to 2,
+        TokenType.IDIVIDE to 2
+    )
+
     override fun interpret(expression: NumberExpression, context: Context): Any {
         val tokens = mutableListOf<Token>()
 
@@ -17,7 +26,11 @@ object NumberInterpreter : ExpressionInterpreter<NumberExpression> {
                 is TokenElement -> tokens.add(element.token)
 
                 else -> {
-                    val result = (element.interpret(context) as Number)
+                    val result = element.interpret(context)
+
+                    if (result !is Number) {
+                        throw IllegalStateException("Result should be a number value")
+                    }
 
                     tokens.add(
                         Token(
@@ -81,10 +94,6 @@ object NumberInterpreter : ExpressionInterpreter<NumberExpression> {
         for (token in tokens) {
             when (token.type) {
                 TokenType.NUMBER -> valuesStack.add(token.value.toDouble())
-                TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MOD, TokenType.IDIVIDE -> operatorsStack.add(
-                    token.type
-                )
-
                 TokenType.LPAREN -> operatorsStack.add(token.type)
                 TokenType.RPAREN -> {
                     while (operatorsStack.isNotEmpty() && operatorsStack.last() != TokenType.LPAREN) {
@@ -93,6 +102,18 @@ object NumberInterpreter : ExpressionInterpreter<NumberExpression> {
                     if (operatorsStack.isEmpty() || operatorsStack.removeLast() != TokenType.LPAREN) {
                         throw IllegalStateException("Mismatched parentheses")
                     }
+                }
+
+                TokenType.PLUS, TokenType.MINUS, TokenType.MULTIPLY, TokenType.DIVIDE, TokenType.MOD, TokenType.IDIVIDE -> {
+                    while (
+                        operatorsStack.isNotEmpty() &&
+                        operatorsStack.last() != TokenType.LPAREN &&
+                        precedences[operatorsStack.last()]!! >= precedences[token.type]!!
+                    ) {
+                        applyOperator()
+                    }
+
+                    operatorsStack.add(token.type)
                 }
 
                 else -> throw IllegalStateException("Unexpected token: ${token.type}")

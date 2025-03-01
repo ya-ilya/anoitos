@@ -1,8 +1,8 @@
 package org.anoitos.interpreter.library.libraries
 
+import org.anoitos.interpreter.InterpretResult
 import org.anoitos.interpreter.library.Library
 import org.anoitos.interpreter.library.LibraryFunction
-import org.anoitos.interpreter.InterpretResult
 import kotlin.math.pow
 
 @Suppress("unused")

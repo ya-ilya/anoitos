@@ -1,9 +1,9 @@
 package org.anoitos.interpreter.context
 
+import org.anoitos.interpreter.InterpretResult
 import org.anoitos.interpreter.extensions.interpret
 import org.anoitos.interpreter.library.Library
 import org.anoitos.interpreter.library.LibraryRegistry
-import org.anoitos.interpreter.InterpretResult
 import org.anoitos.parser.statement.statements.ClassStatement
 import org.anoitos.parser.statement.statements.FunStatement
 

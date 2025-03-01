@@ -73,13 +73,15 @@ object Lexer {
                 builder.append(
                     when {
                         char.isDigit() -> char
-                        char == TokenType.DOT.value[0] && input.elementAtOrNull(current + index + 1)?.isDigit() == true -> {
+                        char == TokenType.DOT.value[0] && input.elementAtOrNull(current + index + 1)
+                            ?.isDigit() == true -> {
                             if (builder.contains(TokenType.DOT.value[0])) {
                                 break
                             }
 
                             char
                         }
+
                         else -> break
                     }
                 )
