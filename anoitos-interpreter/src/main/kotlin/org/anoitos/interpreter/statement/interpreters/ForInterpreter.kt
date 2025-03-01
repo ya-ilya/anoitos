@@ -18,7 +18,7 @@ object ForInterpreter : StatementInterpreter<ForStatement> {
                 InterpretResult.Continue -> continue
                 is InterpretResult.Return -> return result
             }
-            index = forContext.getVariable(statement.identifier.value) as Int + 1
+            index = forContext.getVariable(statement.identifier.value)!!.value as Int + 1
         }
 
         return null

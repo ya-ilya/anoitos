@@ -13,6 +13,10 @@ object LibraryRegistry {
         this["math"] = MathLibrary
     }
 
+    operator fun get(name: String): Library? {
+        return libraries[name]
+    }
+
     operator fun set(name: String, library: Library) {
         if (libraries.containsKey(name)) {
             throw RuntimeException()

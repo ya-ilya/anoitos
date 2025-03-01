@@ -15,8 +15,10 @@ object SetInterpreter : StatementInterpreter<SetStatement> {
                 val variable = currentContext.getVariable(pathStatement.token.value)
 
                 if (variable != null) {
-                    if (variable is Context) {
-                        currentContext = variable
+                    val variableValue = variable.value
+
+                    if (variableValue is Context) {
+                        currentContext = variableValue
                         continue
                     } else {
                         currentContext.setVariable(pathStatement.token.value, statement.value.interpret(context)!!)

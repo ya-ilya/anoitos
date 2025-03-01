@@ -20,7 +20,7 @@ class InterpreterTest {
 
         assertEquals(
             20.0,
-            context.getVariable("variable")
+            context.getVariable("variable")?.value
         )
     }
 
@@ -42,7 +42,7 @@ class InterpreterTest {
 
         assertEquals(
             120.0,
-            context.getVariable("result")
+            context.getVariable("result")?.value
         )
     }
 
@@ -66,7 +66,7 @@ class InterpreterTest {
 
         assertEquals(
             55.0,
-            context.getVariable("result")
+            context.getVariable("result")?.value
         )
     }
 }

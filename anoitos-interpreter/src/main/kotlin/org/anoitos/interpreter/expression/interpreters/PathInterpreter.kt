@@ -18,7 +18,7 @@ object PathInterpreter : ExpressionInterpreter<PathExpression> {
                     val variable = currentContext.getVariable(element.token.value)
 
                     if (variable != null) {
-                        currentValue = variable
+                        currentValue = variable.value
                         break
                     }
 

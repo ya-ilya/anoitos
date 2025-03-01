@@ -9,16 +9,6 @@ object NewInterpreter : StatementInterpreter<NewStatement> {
         val className = statement.name.value
         val classContext = context.getClass(className) ?: throw IllegalStateException("Class '${className}' not found")
 
-        val instanceContext = Context()
-
-        for (function in classContext.functions) {
-            instanceContext.addFunction(function)
-        }
-
-        for (variable in classContext.variables) {
-            instanceContext.addVariable(variable.key, variable.value)
-        }
-
-        return instanceContext
+        return classContext.createInstance()
     }
 }

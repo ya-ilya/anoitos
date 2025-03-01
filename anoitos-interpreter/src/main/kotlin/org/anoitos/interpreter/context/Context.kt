@@ -7,57 +7,78 @@ import org.anoitos.interpreter.InterpretResult
 import org.anoitos.parser.statement.statements.ClassStatement
 import org.anoitos.parser.statement.statements.FunStatement
 
-class Context(private val parent: Context? = null) {
-    private var isFunContext: Boolean = false
-    private val imports = mutableListOf<Library>()
-    val variables = mutableMapOf<String, Any>()
+@Suppress("MemberVisibilityCanBePrivate")
+class Context(
+    private val parent: Context? = null,
+    private var isFunctionContext: Boolean = false
+) {
+    private val imports = mutableSetOf<Library>()
     private val classes = mutableMapOf<String, Context>()
-    val functions = mutableListOf<FunStatement>()
+    private val functions = mutableMapOf<String, FunStatement>()
+    private val variables = mutableMapOf<String, ContextVariable>()
 
     fun addImport(path: String) {
-        imports.add(LibraryRegistry.libraries[path]!!)
+        if (parent != null) {
+            throw IllegalStateException("Can't add an import to a context that has a parent")
+        }
+
+        val library = LibraryRegistry[path] ?: throw IllegalStateException("Library '${path}' not found")
+
+        if (imports.contains(library)) {
+            throw IllegalStateException("Can't add the same import twice")
+        }
+
+        imports.add(library)
+    }
+
+    fun addClass(name: String, context: Context) {
+        if (getClass(name) != null) {
+            throw IllegalStateException("Class '${name} already exists")
+        }
+
+        classes[name] = context
+    }
+
+    fun addClass(statement: ClassStatement) {
+        val className = statement.name.value
+
+        if (getClass(className) != null) {
+            throw IllegalStateException("Class '${className} already exists")
+        }
+
+        classes[className] = Context(parent = this).apply {
+            for (funStatement in statement.functions) {
+                addFunction(funStatement)
+            }
+
+            for (varStatement in statement.variables) {
+                addVariable(varStatement.name.value, varStatement.value.interpret(this)!!)
+            }
+        }
+    }
+
+    fun addFunction(statement: FunStatement) {
+        val functionName = statement.name.value
+
+        if (getFunction(functionName) != null) {
+            throw IllegalStateException("Function '${functionName}' already exists")
+        }
+
+        functions[functionName] = statement
     }
 
     fun addVariable(name: String, value: Any) {
-        check(getVariable(name) == null) { "Variable '$name' already exists" }
-        variables[name] = value
+        if (getVariable(name) != null) {
+            throw IllegalStateException("Variable '${name}' already exists")
+        }
+
+        variables[name] = ContextVariable(value)
     }
 
     fun setVariable(name: String, value: Any) {
-        var parent: Context? = this
+        val variable = getVariable(name) ?: throw IllegalStateException("Variable '${name}' not found")
 
-        while (parent != null) {
-            if (parent.variables.containsKey(name)) {
-                parent.variables[name] = value
-                return
-            } else {
-                parent = parent.parent
-            }
-        }
-
-        throw IllegalStateException("Variable '$name' not found")
-    }
-
-    fun addClass(classStatement: ClassStatement) {
-        if (getClass(classStatement.name.value) != null) {
-            throw IllegalStateException("Class '${classStatement.name.value}' not found")
-        }
-        classes[classStatement.name.value] = Context(this).also {
-            for (funStatement in classStatement.functions) {
-                it.addFunction(funStatement)
-            }
-
-            for (varStatement in classStatement.variables) {
-                it.addVariable(varStatement.name.value, varStatement.value.interpret(it)!!)
-            }
-        }
-    }
-
-    fun addFunction(funStatement: FunStatement) {
-        if (getFunction(funStatement.name.value) != null) {
-            throw IllegalStateException("Function '${funStatement.name.value}' not found")
-        }
-        functions.add(funStatement)
+        variable.value = value
     }
 
     fun executeFunction(name: String, arguments: List<Any>): Any? {
@@ -90,41 +111,75 @@ class Context(private val parent: Context? = null) {
                 }
             }
 
-            throw IllegalStateException("Method '${name}' not found")
+            throw IllegalStateException("Function '${name}' not found")
         }
 
-        var funParent = this
-        var parent: Context? = parent
-        while (parent != null) {
-            if (parent.isFunContext) {
-                funParent = parent.parent!!
+        var functionParent: Context = this
+
+        var loopParent: Context? = parent
+        while (loopParent != null) {
+            if (loopParent.isFunctionContext) {
+                functionParent = loopParent.parent!!
             }
 
-            parent = parent.parent
+            loopParent = loopParent.parent
         }
 
-        val context = Context(funParent)
-        context.isFunContext = true
+        val context = Context(functionParent, true)
 
-        for ((index, parameter) in function.parameters.withIndex()) {
-            context.addVariable(parameter, arguments[index])
-        }
+        return function.let {
+            for ((index, parameter) in it.parameters.withIndex()) {
+                context.addVariable(parameter, arguments[index])
+            }
 
-        return when (val result = function.body.interpret(context)) {
-            is InterpretResult.Return -> result.value
-            else -> null
+            when (val result = it.body.interpret(context)) {
+                is InterpretResult.Return -> result.value
+                else -> null
+            }
         }
     }
 
-    fun getVariable(name: String): Any? =
-        variables.getOrDefault(name, parent?.getVariable(name))
+    fun getImports(): Set<Library> {
+        return imports + (parent?.getImports() ?: emptySet())
+    }
 
-    fun getClass(name: String): Context? =
-        classes[name] ?: parent?.getClass(name)
+    fun getClass(name: String): Context? {
+        return if (classes.containsKey(name)) {
+            classes[name]!!
+        } else {
+            parent?.getClass(name)
+        }
+    }
 
-    fun getFunction(name: String): FunStatement? =
-        functions.firstOrNull { it.name.value == name } ?: parent?.getFunction(name)
+    fun getFunction(name: String): FunStatement? {
+        return if (functions.containsKey(name)) {
+            functions[name]!!
+        } else {
+            parent?.getFunction(name)
+        }
+    }
 
-    fun getImports(): List<Library> =
-        imports + (parent?.getImports() ?: emptyList())
+    fun getVariable(name: String): ContextVariable? {
+        return if (variables.containsKey(name)) {
+            variables[name]!!
+        } else {
+            parent?.getVariable(name)
+        }
+    }
+
+    fun createInstance(): Context {
+        return Context(parent).apply {
+            for (function in functions) {
+                addFunction(function.value)
+            }
+
+            for (variable in variables) {
+                addVariable(variable.key, variable.value)
+            }
+
+            for (`class` in classes) {
+                addClass(`class`.key, `class`.value)
+            }
+        }
+    }
 }
